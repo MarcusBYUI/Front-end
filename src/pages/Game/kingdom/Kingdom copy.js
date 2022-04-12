@@ -54,7 +54,10 @@ const Kingdom = () => {
   const [stakeIds, setStakeIds] = useState([]);
   const [tokenId, settokenId] = useState(0);
 
-  const [changeBal, setChangeBal] = useState(false);
+  //monitor changes
+  const [structChange, setStructChange] = useState(false);
+  const [structIdChange, setIdChange] = useState(false);
+  const [structstake, setStructStake] = useState(false);
 
   const legendBalanceHandler = async () => {
     if (window.ethereum) {
@@ -94,8 +97,8 @@ const Kingdom = () => {
         const balance = await contract.balanceOf(address);
         //const balance = ethers.utils.formatEther(balanceBig);
 
-        setAvailableStructCount(Math.round(await balance));
-        setChange((prevState) => !prevState);
+        setAvailableStructCount(Math.round(balance));
+        setStructChange((prevState) => !prevState);
       } catch (error) {
         console.log("error", error);
         setChange((prevState) => !prevState);
@@ -120,7 +123,7 @@ const Kingdom = () => {
         const stakeIds = await contract.staked(address);
         let ids = [];
 
-        await stakeIds.forEach(function (element) {
+        stakeIds.forEach(function (element) {
           ids.push(element.stakeId);
         });
         setStakeIds([...ids]);
@@ -159,7 +162,9 @@ const Kingdom = () => {
           response.wait().then((data) => {
             console.log(data);
             setChange((prevState) => !prevState);
-            setChangeBal((prevState) => !prevState);
+            setStructChange((prevState) => !prevState);
+            setIdChange((prevState) => !prevState);
+            setStructStake((prevState) => !prevState);
           });
         } catch (error) {
           console.log("error", error);
@@ -184,6 +189,9 @@ const Kingdom = () => {
           bolstakingContract
         );
         response ? setApproved(true) : setApproved(false);
+        setStructChange((prevState) => !prevState);
+        setIdChange((prevState) => !prevState);
+        setStructStake((prevState) => !prevState);
       } catch (error) {
         console.log("error", error);
         setChange((prevState) => !prevState);
@@ -230,7 +238,9 @@ const Kingdom = () => {
         const response = await contract.unstake(stakeIds[0]);
         response.wait().then((data) => {
           setChange((prevState) => !prevState);
-          setChangeBal((prevState) => !prevState);
+          setStructChange((prevState) => !prevState);
+          setIdChange((prevState) => !prevState);
+          setStructStake((prevState) => !prevState);
         });
       } catch (error) {
         console.log("error", error);
@@ -280,7 +290,6 @@ const Kingdom = () => {
         }
         //End Of Filter
         settokenId(idSet[0]);
-        console.log(idSet);
       } catch (error) {
         console.log("error", error);
         setChange((prevState) => !prevState);
@@ -288,16 +297,18 @@ const Kingdom = () => {
     }
   };
   useEffect(() => {
-    console.log("i got triggered");
     checkApproved();
-    handleIds();
     legendBalanceHandler();
   }, [change]);
-
+  useEffect(() => {
+    handleIds();
+  }, [structIdChange]);
+  useEffect(() => {
+    checkStakedStruct();
+  }, [structstake]);
   useEffect(() => {
     structBalanceHandler();
-    checkStakedStruct();
-  }, [changeBal]);
+  }, [structChange]);
   return (
     <div className="kingdom min-h-[175vh] w-full md:min-h-[110vh] lg:min-h-[170vh]">
       <h1 className="px-2 pt-32 text-4xl font-semibold text-[#FEDC8C] sm:text-7xl md:mx-20 md:pt-40 lg:mx-[15rem] lg:pt-40">

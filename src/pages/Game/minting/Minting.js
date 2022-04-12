@@ -14,13 +14,15 @@ const images = ImageBundleImport(
 );
 const imgLinks = Object.values(images);
 
-const bolNFTAddress = "0x139939286064251C28Dd686c268823B7bC6366E2";
+const bolNFTAddress = "0x1A46Dd62c4CC8639562E907E3718b099E05AD27E";
 const legendAddress = "0xB6cEAdcd2A31F9d386111F3B3aeDcafCfCEF20e5";
 
 const Minting = () => {
   //// check approve
   const [approved, setApproved] = useState(false);
   const [change, setChange] = useState(true);
+  const [changeBal, setchangeBal] = useState(true);
+
   const [legendCount, setLegendCount] = useState(0);
 
   const checkApproved = async () => {
@@ -33,10 +35,7 @@ const Minting = () => {
       });
       try {
         //debugger;
-        const response = await contract.allowance(
-          address,
-          "0x139939286064251C28Dd686c268823B7bC6366E2"
-        );
+        const response = await contract.allowance(address, bolNFTAddress);
         const balance = Math.round(ethers.utils.formatEther(response));
         balance < 2000 ? setApproved(false) : setApproved(true);
       } catch (error) {
@@ -46,13 +45,9 @@ const Minting = () => {
   };
   checkApproved();
 
-  useEffect(() => {
-    checkApproved();
-  }, [change]);
-
   /////count
   const [count, setCount] = useState(0);
-  const [countStructure, setCountStructure] = useState(0);
+  //const [countStructure, setCountStructure] = useState(0);
 
   const countAdd = () => {
     if (count >= 0) {
@@ -64,20 +59,20 @@ const Minting = () => {
       setCount(count - 1);
     }
   };
-  const countAddStructure = () => {
-    if (countStructure >= 0) {
-      setCountStructure(countStructure + 1);
-    }
-  };
-  const countRemoveStructure = () => {
-    if (countStructure >= 1) {
-      setCountStructure(countStructure - 1);
-    }
-  };
+  // const countAddStructure = () => {
+  //   if (countStructure >= 0) {
+  //     setCountStructure(countStructure + 1);
+  //   }
+  // };
+  // const countRemoveStructure = () => {
+  //   if (countStructure >= 1) {
+  //     setCountStructure(countStructure - 1);
+  //   }
+  // };
 
   const handleMint = async () => {
     if (window.ethereum) {
-      const feeNum = count * 0.1;
+      const feeNum = count * 2;
       const valueFee = { value: ethers.utils.parseEther(`${feeNum}`) };
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
@@ -104,7 +99,11 @@ const Minting = () => {
       try {
         //debugger;
         const response = await contract.randMint(legendAddress);
-        console.log("response", response);
+        response.wait().then((data) => {
+          console.log(data);
+          setChange((prevState) => !prevState);
+          setchangeBal((prevState) => !prevState);
+        });
       } catch (error) {
         console.log("error", error);
       }
@@ -129,6 +128,7 @@ const Minting = () => {
         });
       } catch (error) {
         console.log("error", error);
+        setChange((prevState) => !prevState);
       }
     }
   };
@@ -151,12 +151,18 @@ const Minting = () => {
         setLegendCount(Math.round(balance));
       } catch (error) {
         console.log("error", error);
+        setchangeBal((prevState) => !prevState);
       }
     }
   };
 
-  balanceHandler();
+  useEffect(() => {
+    checkApproved();
+  }, [change]);
 
+  useEffect(() => {
+    balanceHandler();
+  }, [changeBal]);
   return (
     <div className="minting min-h-[175vh] w-full md:min-h-[110vh] lg:min-h-[130vh]">
       <h1 className="px-2 pt-40 text-6xl font-semibold text-[#FEDC8C] sm:text-7xl md:mx-20 md:pt-40 lg:mx-[15rem] lg:pt-40">
