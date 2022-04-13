@@ -14,7 +14,8 @@ const images = ImageBundleImport(
 );
 const imgLinks = Object.values(images);
 
-const bolNFTAddress = "0x1A46Dd62c4CC8639562E907E3718b099E05AD27E";
+const structContract = "0x1A46Dd62c4CC8639562E907E3718b099E05AD27E";
+
 const legendAddress = "0xB6cEAdcd2A31F9d386111F3B3aeDcafCfCEF20e5";
 
 const Minting = () => {
@@ -35,7 +36,7 @@ const Minting = () => {
       });
       try {
         //debugger;
-        const response = await contract.allowance(address, bolNFTAddress);
+        const response = await contract.allowance(address, structContract);
         const balance = Math.round(ethers.utils.formatEther(response));
         balance < 2000 ? setApproved(false) : setApproved(true);
       } catch (error) {
@@ -76,7 +77,7 @@ const Minting = () => {
       const valueFee = { value: ethers.utils.parseEther(`${feeNum}`) };
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
-      const contract = new ethers.Contract(bolNFTAddress, bolAbi, signer);
+      const contract = new ethers.Contract(structContract, bolAbi, signer);
       try {
         //debugger;
         const response = await contract.mintToken(
@@ -95,7 +96,7 @@ const Minting = () => {
     if (window.ethereum) {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
-      const contract = new ethers.Contract(bolNFTAddress, bolAbi, signer);
+      const contract = new ethers.Contract(structContract, bolAbi, signer);
       try {
         //debugger;
         const response = await contract.randMint(legendAddress);
@@ -119,7 +120,7 @@ const Minting = () => {
       try {
         //debugger;
         const response = await contract.approve(
-          bolNFTAddress,
+          structContract,
           "20000000000000000000000000000"
         );
         response.wait().then((data) => {
@@ -128,7 +129,6 @@ const Minting = () => {
         });
       } catch (error) {
         console.log("error", error);
-        setChange((prevState) => !prevState);
       }
     }
   };

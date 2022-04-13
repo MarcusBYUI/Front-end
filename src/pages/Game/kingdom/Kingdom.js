@@ -19,42 +19,44 @@ const Kingdom = () => {
   const [stakeStructureArray, setStakeStructureArray] = useState([]);
   const [stakedStructureArray, setStakedStructureArray] = useState([]);
   const [statsArray, setStatesArray] = useState([
-    { name: "Lands Minted", value: 5 },
-    { name: "Structures Minted", value: 6 },
-    { name: "Lands Staked", value: 4 },
-    { name: "Structures Staked", value: 4 },
-    { name: "$LEGEND Claimed", value: 976.94 },
+    { name: "Lands Minted", value: "-" },
+    { name: "Structures Minted", value: "-" },
+    { name: "Lands Staked", value: "-" },
+    { name: "Structures Staked", value: "-" },
+    { name: "$LEGEND Claimed", value: "-" },
   ]);
   const [kingdomArray, setKingdomArray] = useState([
-    { name: "Lands Staked", value: 4 },
-    { name: "Structures Staked", value: 4 },
-    { name: "$LEGEND Claimed", value: 976.94 },
-    { name: "Space Available", value: 5 },
-    { name: "Kingdom ATK", value: 50 },
-    { name: "Kingdom DEF", value: 67 },
-    { name: "Kingdom UTIL", value: 42 },
+    { name: "Lands Staked", value: "-" },
+    { name: "Structures Staked", value: "-" },
+    { name: "$LEGEND Claimed", value: "-" },
+    { name: "Space Available", value: "-" },
+    { name: "Kingdom ATK", value: "-" },
+    { name: "Kingdom DEF", value: "-" },
+    { name: "Kingdom UTIL", value: "-" },
   ]);
   const [leaderboardArray, setLeaderboardArray] = useState([
-    { idUser: "0xE410", value: 4, tag: "$LEGEND" },
-    { idUser: "0xE411", value: 4, tag: "$LEGEND" },
-    { idUser: "0xE412", value: 976.94, tag: "$LEGEND" },
-    { idUser: "0xE413", value: 5, tag: "$LEGEND" },
-    { idUser: "0xE414", value: 50, tag: "$LEGEND" },
-    { idUser: "0xE415", value: 67, tag: "$LEGEND" },
-    { idUser: "0xE416", value: 42, tag: "$LEGEND" },
+    { idUser: "0xE410", value: "-", tag: "$LEGEND" },
+    { idUser: "0xE411", value: "-", tag: "$LEGEND" },
+    { idUser: "0xE412", value: "-", tag: "$LEGEND" },
+    { idUser: "0xE413", value: "-", tag: "$LEGEND" },
+    { idUser: "0xE414", value: "-", tag: "$LEGEND" },
+    { idUser: "0xE415", value: "-", tag: "$LEGEND" },
+    { idUser: "0xE416", value: "-", tag: "$LEGEND" },
   ]);
 
   const legendContract = "0xB6cEAdcd2A31F9d386111F3B3aeDcafCfCEF20e5";
   const structContract = "0x1A46Dd62c4CC8639562E907E3718b099E05AD27E";
-  const bolstakingContract = "0xBC40Db08b18a59f447A79A4Bd1BABe99b254513D";
-  const rewardToken = "0x0b9d5D9136855f6FEc3c0993feE6E9CE8a297846";
+  const bolstakingContract = "0x99de1559fb8c59a0AAa58cfcc3Dd668A67370ee3";
 
-  const [change, setChange] = useState(true);
   const [approved, setApproved] = useState(false);
   const [stakeIds, setStakeIds] = useState([]);
   const [tokenId, settokenId] = useState(0);
+  const [stakeClick, setStakeClick] = useState(0);
+  const [unStakeClick, setUnStakeClick] = useState(0);
+  const [claimClick, setClaimClick] = useState(0);
 
-  const [changeBal, setChangeBal] = useState(false);
+  const [claimBal, setClaimBal] = useState(0);
+  const [claimBalCheck, setClaimBalCheck] = useState(0);
 
   const legendBalanceHandler = async () => {
     if (window.ethereum) {
@@ -74,7 +76,6 @@ const Kingdom = () => {
         setLegendCount(Math.round(balance));
       } catch (error) {
         console.log("error", error);
-        setChange((prevState) => !prevState);
       }
     }
   };
@@ -95,10 +96,8 @@ const Kingdom = () => {
         //const balance = ethers.utils.formatEther(balanceBig);
 
         setAvailableStructCount(Math.round(await balance));
-        setChange((prevState) => !prevState);
       } catch (error) {
         console.log("error", error);
-        setChange((prevState) => !prevState);
       }
     }
   };
@@ -128,7 +127,6 @@ const Kingdom = () => {
         setStructureStakedCount(ids.length);
       } catch (error) {
         console.log("error", error);
-        setChange((prevState) => !prevState);
       }
     }
   };
@@ -154,16 +152,17 @@ const Kingdom = () => {
           const response = await contract.stake(
             structContract,
             tokenId,
-            rewardToken
+            legendContract
           );
           response.wait().then((data) => {
-            console.log(data);
-            setChange((prevState) => !prevState);
-            setChangeBal((prevState) => !prevState);
+            // update the front end bal before the blockchain data returns
+            setStructureStakedCount((prevState) => prevState + 1);
+            setAvailableStructCount((prevState) => prevState - 1);
+            structBalanceHandler();
+            checkStakedStruct();
           });
         } catch (error) {
           console.log("error", error);
-          setChange((prevState) => !prevState);
         }
       }
     }
@@ -186,11 +185,9 @@ const Kingdom = () => {
         response ? setApproved(true) : setApproved(false);
       } catch (error) {
         console.log("error", error);
-        setChange((prevState) => !prevState);
       }
     }
   };
-  checkApproved();
 
   const handleApprove = async () => {
     if (window.ethereum) {
@@ -205,12 +202,10 @@ const Kingdom = () => {
           true
         );
         response.wait().then((data) => {
-          console.log(data);
-          setChange((prevState) => !prevState);
+          setApproved(true);
         });
       } catch (error) {
         console.log("error", error);
-        setChange((prevState) => !prevState);
       }
     }
   };
@@ -229,12 +224,75 @@ const Kingdom = () => {
         //debugger;
         const response = await contract.unstake(stakeIds[0]);
         response.wait().then((data) => {
-          setChange((prevState) => !prevState);
-          setChangeBal((prevState) => !prevState);
+          setStructureStakedCount((prevState) => prevState - 1);
+          setAvailableStructCount((prevState) => prevState + 1);
+          structBalanceHandler();
+          checkStakedStruct();
         });
       } catch (error) {
         console.log("error", error);
-        setChange((prevState) => !prevState);
+      }
+    }
+  };
+
+  const handleClaim = async () => {
+    if (window.ethereum) {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(
+        bolstakingContract,
+        stakingAbi,
+        signer
+      );
+      const address = await signer.getAddress().then((response) => {
+        return response;
+      });
+
+      try {
+        //debugger;
+        const response = await contract.claimAll(address);
+        response.wait().then((data) => {
+          legendBalanceHandler();
+          setClaimBal(0);
+        });
+      } catch (error) {
+        console.log("error", error);
+      }
+    }
+  };
+
+  const pendingClaim = async () => {
+    if (window.ethereum) {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(
+        bolstakingContract,
+        stakingAbi,
+        signer
+      );
+      const address = await signer.getAddress().then((response) => {
+        return response;
+      });
+
+      try {
+        //debugger;
+        let allTokens = 0;
+        const response = await contract.claimable(address);
+        response.forEach((claim) => {
+          const num = BigNumber.from(`${claim.amount._hex}`).toString();
+          const tokens = Number(num) * 10 ** -18;
+          console.log(tokens);
+          allTokens += tokens;
+
+          //console.log(Math.round((num + Number.EPSILON) * 100) / 100);
+        });
+        setClaimBal(allTokens);
+        console.log(allTokens);
+
+        // setChange((prevState) => !prevState);
+        // setChangeBal((prevState) => !prevState);
+      } catch (error) {
+        console.log("error", error);
       }
     }
   };
@@ -280,24 +338,89 @@ const Kingdom = () => {
         }
         //End Of Filter
         settokenId(idSet[0]);
-        console.log(idSet);
       } catch (error) {
         console.log("error", error);
-        setChange((prevState) => !prevState);
       }
     }
   };
+
+  const stakeClickHandler = () => {
+    //make button roll
+
+    //make change
+    setStakeClick((prevState) => prevState + 1);
+  };
+
+  const claimClickHandler = () => {
+    //make button roll
+
+    //make change
+    setClaimClick((prevState) => prevState + 1);
+  };
+  const unStakeClickHandler = () => {
+    //make button roll
+
+    //make change
+    setUnStakeClick((prevState) => prevState + 1);
+  };
+
+  const pendingInterval = () => {
+    setInterval(() => {
+      setClaimBalCheck((prevState) => prevState + 1);
+    }, 10000);
+  };
+
+  // const fakePendingInterval = () => {
+  //   setInterval(() => {
+  //     setFakeClaimBalCheck((prevState) => prevState + 1);
+  //   }, 3529);
+  // };
+
+  // const fakeIntervalAddition = (nfts) => {
+  //   setClaimBal((prevState) => prevState + 0.01 * nfts);
+  // };
+  //Use Effects
+  //
+  //
+  //
+  //
+  //
+  // update claim
+  // useEffect(() => {
+  //   structureStakedCount > 0 && fakeIntervalAddition(structureStakedCount);
+  // }, [fakeClaimBalCheck]);
   useEffect(() => {
-    console.log("i got triggered");
-    checkApproved();
-    handleIds();
-    legendBalanceHandler();
-  }, [change]);
+    pendingClaim();
+  }, [claimBalCheck]);
+  //claim
+  useEffect(() => {
+    claimClick !== 0 && handleClaim();
+  }, [claimClick]);
+  //stake
+  useEffect(() => {
+    stakeClick !== 0 && (approved === true ? handleStake() : handleApprove());
+  }, [stakeClick]);
 
   useEffect(() => {
+    unStakeClick !== 0 && handleUnstake();
+  }, [unStakeClick]);
+
+  useEffect(() => {
+    console.log("i got triggered");
+    handleIds();
+    pendingClaim();
+  }, [legendCount, availableStructCount, structureStakedCount]);
+
+  useEffect(() => {
+    checkApproved();
+    legendBalanceHandler();
     structBalanceHandler();
     checkStakedStruct();
-  }, [changeBal]);
+    pendingClaim();
+    pendingInterval();
+    //fakePendingInterval();
+  }, []);
+
   return (
     <div className="kingdom min-h-[175vh] w-full md:min-h-[110vh] lg:min-h-[170vh]">
       <h1 className="px-2 pt-32 text-4xl font-semibold text-[#FEDC8C] sm:text-7xl md:mx-20 md:pt-40 lg:mx-[15rem] lg:pt-40">
@@ -308,7 +431,7 @@ const Kingdom = () => {
       </h2>
 
       <div className="border-div m-auto mt-10 grid min-h-[100vh] w-[90%] grid-cols-1 place-content-center place-items-center gap-4 pb-4 sm:mt-20 sm:w-4/5  md:w-[95%] md:grid-cols-2 md:grid-rows-3 lg:grid-cols-3 lg:grid-rows-2 lg:gap-x-10 xl:w-3/4">
-        <div className='relative flex min-h-[30rem] w-full items-center justify-center bg-[url("/src/Assets/Borders-lg.png")] bg-[length:100%_100%]'>
+        <div className='relative flex min-h-[36rem] w-full items-center justify-center bg-[url("/src/Assets/Borders-lg.png")] bg-[length:100%_100%]'>
           <div className="absolute my-4 mb-5 flex h-[87%] w-10/12 flex-col items-center bg-white">
             <h2 className="text-3xl font-bold sm:text-4xl md:text-4xl">
               Lands
@@ -375,16 +498,27 @@ const Kingdom = () => {
             ))}
           </div>
         </div>
-        <div className='relative flex min-h-[30rem] w-full items-center justify-center bg-[url("/src/Assets/Borders-lg.png")] bg-[length:100%_100%] sm:min-h-[25rem]'>
+        <div className='relative flex min-h-[36rem] w-full items-center justify-center bg-[url("/src/Assets/Borders-lg.png")] bg-[length:100%_100%]'>
           <div className="absolute my-4 mb-5 flex h-[87%] w-10/12 flex-col items-center bg-white">
             <h2 className="text-3xl font-bold sm:text-4xl md:text-4xl">
               Structures
             </h2>
             <div className="h-[0.09rem] w-11/12 bg-slate-900"></div>
-            <h2 className="my-2 flex w-full flex-col items-center justify-evenly self-start text-2xl font-bold sm:flex-row sm:text-2xl md:text-2xl">
-              Unstaked -
-              <span className=" text-sm">Available : {availableCount}</span>
-            </h2>
+            <p className=" mt-2 text-xs">
+              NOTE <br />
+              Rewards begin 15 minutes after staking
+            </p>
+            <p className=" mt-2 text-sm">$Legends Earned</p>
+            <span className=" text-xl ">
+              {Math.round((claimBal + Number.EPSILON) * 100) / 100}
+            </span>
+
+            <button
+              className=" mb-2 mt-2 rounded-md bg-[#FEDC8C] px-4 py-2"
+              onClick={claimClickHandler}
+            >
+              Claim $Legend
+            </button>
             <div className="h-[0.09rem] w-11/12 bg-slate-900"></div>
             <h2 className="my-2 ml-4 self-start text-2xl font-bold md:text-base">
               Can Stake
@@ -401,7 +535,7 @@ const Kingdom = () => {
               )}
               <button
                 className="mb-4 rounded-md bg-[#FEDC8C] px-4 py-2"
-                onClick={approved === true ? handleStake : handleApprove}
+                onClick={stakeClickHandler}
               >
                 {approved === true ? "Stake Structure" : "Approve Structure"}
               </button>
@@ -423,7 +557,9 @@ const Kingdom = () => {
               <button
                 className="mb-4 rounded-md bg-[#FEDC8C] px-4 py-2"
                 onClick={
-                  Number(structureStakedCount) > 0 ? handleUnstake : () => {}
+                  Number(structureStakedCount) > 0
+                    ? unStakeClickHandler
+                    : () => {}
                 }
               >
                 Unstake Structure
