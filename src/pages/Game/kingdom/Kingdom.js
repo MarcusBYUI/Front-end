@@ -281,13 +281,11 @@ const Kingdom = () => {
         response.forEach((claim) => {
           const num = BigNumber.from(`${claim.amount._hex}`).toString();
           const tokens = Number(num) * 10 ** -18;
-          console.log(tokens);
           allTokens += tokens;
 
           //console.log(Math.round((num + Number.EPSILON) * 100) / 100);
         });
         setClaimBal(allTokens);
-        console.log(allTokens);
 
         // setChange((prevState) => !prevState);
         // setChangeBal((prevState) => !prevState);
