@@ -47,7 +47,7 @@ const Kingdom = (props) => {
 
   const legendContract = "0xB6cEAdcd2A31F9d386111F3B3aeDcafCfCEF20e5";
   const structContract = "0x1A46Dd62c4CC8639562E907E3718b099E05AD27E";
-  const bolstakingContract = "0x129e6b12418322b8360748e5cae63736BA42e150";
+  const bolstakingContract = "0x99de1559fb8c59a0AAa58cfcc3Dd668A67370ee3";
   const IMGBASEURL =
     "https://bol.mypinata.cloud/ipfs/QmbT92ijUi3iJXJv9zz1yJxMaRDkC9LyExUAQd8b5n3eie/";
 
@@ -60,7 +60,6 @@ const Kingdom = (props) => {
 
   const [claimBal, setClaimBal] = useState(0);
   const [claimBalCheck, setClaimBalCheck] = useState(0);
-  const [stakeIdTokenIdDic, setStakeIdTokenIdDic] = useState({});
 
   //images
   //
@@ -72,89 +71,31 @@ const Kingdom = (props) => {
   //
 
   const [walletStructImages, setWalletStructImages] = useState([]);
-  const [walletCurImage, setWalletCurImage] = useState(0);
+  const [walletCurImage, setWalletCurImage] = useState(1);
+
+  const [prev, setPrev] = useState(0);
+  const [next, setNext] = useState(0);
 
   const prevSlide = () => {
     const length = walletStructImages.length;
 
-    setWalletCurImage(walletCurImage === 0 ? length - 1 : walletCurImage - 1);
+    setWalletCurImage(walletCurImage - 1);
+    walletCurImage < 0 && setWalletCurImage(length - 1);
+    console.log(walletCurImage);
   };
 
   const nextSlide = () => {
     const length = walletStructImages.length;
-    setWalletCurImage(walletCurImage === length - 1 ? 0 : walletCurImage + 1);
+    setWalletCurImage(walletCurImage + 1);
+    walletCurImage === length && setWalletCurImage(0);
+    console.log(walletCurImage);
   };
 
   //
   //
-  //Images staked
   //
   //
   //
-  //
-  const [stakedIdsList, setstakedIdsList] = useState([]);
-  const [stakedCurImage, setStakedCurImage] = useState(0);
-
-  const prevStakedSlide = () => {
-    const length = stakedIdsList.length;
-
-    setStakedCurImage(stakedCurImage === 0 ? length - 1 : stakedCurImage - 1);
-  };
-
-  const nextStakedSlide = () => {
-    const length = stakedIdsList.length;
-    setStakedCurImage(stakedCurImage === length - 1 ? 0 : stakedCurImage + 1);
-  };
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-
-  // const generateTokenIdsFromStakeIds = async () => {
-  //   if (window.ethereum) {
-  //     const provider = new ethers.providers.Web3Provider(window.ethereum);
-  //     const signer = provider.getSigner();
-  //     const contract = new ethers.Contract(
-  //       bolstakingContract,
-  //       stakingAbi,
-  //       signer
-  //     );
-  //     const address = await signer.getAddress().then(function (response) {
-  //       return response;
-  //     });
-  //     try {
-  //       //debugger;
-  //       const stakeIds = await contract.staked(address);
-  //       let ids = [];
-
-  //       await stakeIds.forEach(function (element) {
-  //         ids.push(element.stakeId);
-  //       });
-  //       const lastStakeIds = [...ids];
-
-  //       //debugger;
-
-  //       //console.log(await address);
-  //       // get ids and keypair of mapping
-  //       let newdic = {};
-  //       let IdList = [];
-  //       lastStakeIds.forEach(async (stakeid) => {
-  //         const tokenId = await contract.stakedtokenId(stakeid);
-  //         const test = BigNumber.from(tokenId).toString();
-
-  //         newdic[test] = stakeid;
-  //         IdList.push(BigNumber.from(tokenId).toString());
-  //       });
-  //       setStakeIdTokenIdDic(newdic);
-  //       setstakedIdsList(IdList);
-  //     } catch (error) {
-  //       console.log("error", error);
-  //     }
-  //   }
-  // };
   //
   //
   //
@@ -256,7 +197,7 @@ const Kingdom = (props) => {
           //debugger;
           const response = await contract.stake(
             structContract,
-            tokenId[walletCurImage],
+            tokenId,
             legendContract
           );
           response.wait().then((data) => {
@@ -265,7 +206,6 @@ const Kingdom = (props) => {
             setAvailableStructCount((prevState) => prevState - 1);
             structBalanceHandler();
             checkStakedStruct();
-            //generateTokenIdsFromStakeIds();
           });
         } catch (error) {
           console.log("error", error);
@@ -328,15 +268,12 @@ const Kingdom = (props) => {
 
       try {
         //debugger;
-        const response = await contract.unstake(
-          stakeIdTokenIdDic[stakedIdsList[stakedCurImage]]
-        );
+        const response = await contract.unstake(stakeIds[0]);
         response.wait().then((data) => {
           setStructureStakedCount((prevState) => prevState - 1);
           setAvailableStructCount((prevState) => prevState + 1);
           structBalanceHandler();
           checkStakedStruct();
-          //generateTokenIdsFromStakeIds();
         });
       } catch (error) {
         console.log("error", error);
@@ -414,19 +351,6 @@ const Kingdom = (props) => {
       });
       const idSet = [];
       try {
-        const stakingContract = new ethers.Contract(
-          bolstakingContract,
-          stakingAbi,
-          signer
-        );
-        const stakeIds = await stakingContract.staked(address);
-        let ids = [];
-
-        await stakeIds.forEach(function (element) {
-          ids.push(element.stakeId);
-        });
-        const lastStakeIds = [...ids];
-
         //debugger;
         const changedIds = await contract.ownershipChangeIds(address);
         const mintIds = await contract.getIds(address);
@@ -457,28 +381,8 @@ const Kingdom = (props) => {
           });
         }
         //End Of Filter
-        // staked Ids
-
-        //debugger;
-
-        //console.log(await address);
-        // get ids and keypair of mapping
-        let newdic = {};
-        let IdList = [];
-        lastStakeIds.forEach(async (stakeid) => {
-          const tokenId = await stakingContract.stakedtokenId(stakeid);
-          const test = BigNumber.from(tokenId).toString();
-
-          newdic[test] = stakeid;
-          IdList.push(BigNumber.from(tokenId).toString());
-        });
-        setStakeIdTokenIdDic(newdic);
-        setstakedIdsList(IdList);
-
-        //end
-        settokenId(idSet);
+        settokenId(idSet[0]);
         setWalletStructImages(idSet);
-        //generateTokenIdsFromStakeIds();
       } catch (error) {
         console.log("error", error);
       }
@@ -546,14 +450,13 @@ const Kingdom = (props) => {
     unStakeClick !== 0 && handleUnstake();
   }, [unStakeClick]);
 
-  // useEffect(() => {
-  //   generateTokenIdsFromStakeIds();
-  // }, [stakeIds]);
+  useEffect(() => {
+    unStakeClick !== 0 && handleUnstake();
+  }, [tokenId]);
 
   useEffect(() => {
     console.log("i got triggered");
     handleIds();
-    //generateTokenIdsFromStakeIds();
     pendingClaim();
   }, [legendCount, availableStructCount, structureStakedCount]);
 
@@ -564,7 +467,6 @@ const Kingdom = (props) => {
     checkStakedStruct();
     pendingClaim();
     pendingInterval();
-    //generateTokenIdsFromStakeIds();
     //fakePendingInterval();
   }, []);
 
@@ -681,27 +583,13 @@ const Kingdom = (props) => {
                     className="left-arrow"
                     onClick={prevSlide}
                   />
-                  {walletStructImages.map((item) => {
-                    return (
-                      <div
-                        className={
-                          walletStructImages.indexOf(item) === walletCurImage
-                            ? "  active"
-                            : "slide"
-                        }
-                      >
-                        {walletStructImages.indexOf(item) ===
-                          walletCurImage && (
-                          <img
-                            key={walletStructImages.indexOf(item)}
-                            src={IMGBASEURL + item + ".png"}
-                            alt={item}
-                          />
-                        )}
-                      </div>
-                    );
-                  })}
-
+                  {walletStructImages.map((item) => (
+                    <img
+                      key={walletStructImages.indexOf(item)}
+                      src={IMGBASEURL + item + ".png"}
+                      alt={item}
+                    />
+                  ))}
                   {/* <img src={IMGBASEURL + 1 + ".png"} alt="" /> */}
                   <FaArrowAltCircleRight
                     className="right-arrow"
@@ -721,42 +609,14 @@ const Kingdom = (props) => {
               Staked
             </h2>
             <div>
-              {structureStakedCount === 0 ? (
+              {stakedStructureArray.length === 0 ? (
                 <h2 className="mb-4 bg-[#FEDC8C] text-2xl font-bold text-black md:text-base">
                   {structureStakedCount || "No Staked Structure"}
                 </h2>
               ) : (
-                <section className="slider-container">
-                  <FaArrowAltCircleLeft
-                    className="left-arrow"
-                    onClick={prevStakedSlide}
-                  />
-                  {stakedIdsList.map((item) => {
-                    return (
-                      <div
-                        className={
-                          stakedIdsList.indexOf(item) === stakedCurImage
-                            ? "  active"
-                            : "slide"
-                        }
-                      >
-                        {stakedIdsList.indexOf(item) === stakedCurImage && (
-                          <img
-                            key={stakedIdsList.indexOf(item)}
-                            src={IMGBASEURL + item + ".png"}
-                            alt={item}
-                          />
-                        )}
-                      </div>
-                    );
-                  })}
-
-                  {/* <img src={IMGBASEURL + 1 + ".png"} alt="" /> */}
-                  <FaArrowAltCircleRight
-                    className="right-arrow"
-                    onClick={nextStakedSlide}
-                  />
-                </section>
+                stakeArray.map((item, index) => (
+                  <img key={index} src={item} alt={index} />
+                ))
               )}
               <button
                 className="mb-4 rounded-md bg-[#FEDC8C] px-4 py-2"

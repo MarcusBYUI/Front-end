@@ -25,6 +25,7 @@ const Minting = () => {
   const [changeBal, setchangeBal] = useState(true);
 
   const [legendCount, setLegendCount] = useState(0);
+  const mintCID = "QmRFCGar2zMMW75RpvkNXJDtYVe4s8CHUk691DFVnd8kTr"
 
   const checkApproved = async () => {
     if (window.ethereum) {
