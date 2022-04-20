@@ -8,6 +8,7 @@ import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";
 import "./style.css";
 import Structures from "../../Landing-Page/Structures/index";
 import { isDisabled } from "@testing-library/user-event/dist/utils";
+import Swap from "./swap/Swap";
 const Kingdom = (props) => {
   const [legendCount, setLegendCount] = useState(0);
   const [landStakedCount, setLandStakedCount] = useState(0);
@@ -46,14 +47,14 @@ const Kingdom = (props) => {
   ]);
 
   const legendContract = "0xB6cEAdcd2A31F9d386111F3B3aeDcafCfCEF20e5";
-  const structContract = "0x1A46Dd62c4CC8639562E907E3718b099E05AD27E";
+  const structContract = "0xB972D8f16C6e3152f12D424880B9737de0151193";
   const bolstakingContract = "0x129e6b12418322b8360748e5cae63736BA42e150";
   const IMGBASEURL =
     "https://bol.mypinata.cloud/ipfs/QmbT92ijUi3iJXJv9zz1yJxMaRDkC9LyExUAQd8b5n3eie/";
 
   const [approved, setApproved] = useState(false);
   const [stakeIds, setStakeIds] = useState([]);
-  const [tokenId, settokenId] = useState(0);
+  const [tokenId, settokenId] = useState([]);
   const [stakeClick, setStakeClick] = useState(0);
   const [unStakeClick, setUnStakeClick] = useState(0);
   const [claimClick, setClaimClick] = useState(0);
@@ -61,6 +62,12 @@ const Kingdom = (props) => {
   const [claimBal, setClaimBal] = useState(0);
   const [claimBalCheck, setClaimBalCheck] = useState(0);
   const [stakeIdTokenIdDic, setStakeIdTokenIdDic] = useState({});
+  const [swapUpdated, setSwapUpdated] = useState(0);
+
+  //trigger after swap
+  const afterSwapHandler = () => {
+    setSwapUpdated((prevState) => prevState + 1);
+  };
 
   //images
   //
@@ -564,9 +571,7 @@ const Kingdom = (props) => {
     checkStakedStruct();
     pendingClaim();
     pendingInterval();
-    //generateTokenIdsFromStakeIds();
-    //fakePendingInterval();
-  }, []);
+  }, [swapUpdated]);
 
   return (
     <div className="kingdom min-h-[175vh] w-full md:min-h-[110vh] lg:min-h-[170vh]">
@@ -576,6 +581,8 @@ const Kingdom = (props) => {
       <h2 className="text-2xl font-bold text-white sm:text-4xl">
         $LEGEND in your wallet: {legendCount}
       </h2>
+
+      <Swap swapFunc={afterSwapHandler} />
 
       <div className="border-div m-auto mt-10 grid min-h-[100vh] w-[90%] grid-cols-1 place-content-center place-items-center gap-4 pb-4 sm:mt-20 sm:w-4/5  md:w-[95%] md:grid-cols-2 md:grid-rows-3 lg:grid-cols-3 lg:grid-rows-2 lg:gap-x-10 xl:w-3/4">
         <div className='relative flex min-h-[36rem] w-full items-center justify-center bg-[url("/src/Assets/Borders-lg.png")] bg-[length:100%_100%]'>
