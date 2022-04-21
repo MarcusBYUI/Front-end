@@ -13,7 +13,7 @@ const Swap = (props) => {
   //
   //
   const oldStructContract = "0x053502bF08B7D3a54891bB66Fb966eA4C4bA7d02";
-  const newStructContract = "0x230339760A90AfA220206b92B312c1aaa288ECd5";
+  const newStructContract = "0xa9dAb1D58BFDcB34615585e5c0bBE70e00C59bbC";
   const mintCID = "ipfs://QmRFCGar2zMMW75RpvkNXJDtYVe4s8CHUk691DFVnd8kTr/";
 
   //states
