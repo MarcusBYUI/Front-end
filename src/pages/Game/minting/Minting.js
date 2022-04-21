@@ -14,9 +14,9 @@ const images = ImageBundleImport(
 );
 const imgLinks = Object.values(images);
 
-const structContract = "0x1A46Dd62c4CC8639562E907E3718b099E05AD27E";
+const structContract = "0x230339760A90AfA220206b92B312c1aaa288ECd5";
 
-const legendAddress = "0xB6cEAdcd2A31F9d386111F3B3aeDcafCfCEF20e5";
+const legendAddress = "0x3CBef762A500968986E3410a94CbF8daA5cceC84";
 
 const Minting = () => {
   //// check approve
@@ -25,7 +25,7 @@ const Minting = () => {
   const [changeBal, setchangeBal] = useState(true);
 
   const [legendCount, setLegendCount] = useState(0);
-  const mintCID = "QmRFCGar2zMMW75RpvkNXJDtYVe4s8CHUk691DFVnd8kTr"
+  const mintCID = "ipfs://QmRFCGar2zMMW75RpvkNXJDtYVe4s8CHUk691DFVnd8kTr/";
 
   const checkApproved = async () => {
     if (window.ethereum) {
@@ -100,9 +100,12 @@ const Minting = () => {
       const contract = new ethers.Contract(structContract, bolAbi, signer);
       try {
         //debugger;
-        const response = await contract.randMint(legendAddress);
+        const lastId = await contract.getTokenCirculations();
+        const response = await contract.randMint(
+          legendAddress,
+          `${mintCID}${BigNumber.from(lastId._hex).toNumber() + 1}.json`
+        );
         response.wait().then((data) => {
-          console.log(data);
           setChange((prevState) => !prevState);
           setchangeBal((prevState) => !prevState);
         });
@@ -125,7 +128,6 @@ const Minting = () => {
           "20000000000000000000000000000"
         );
         response.wait().then((data) => {
-          console.log(data);
           setChange((prevState) => !prevState);
         });
       } catch (error) {

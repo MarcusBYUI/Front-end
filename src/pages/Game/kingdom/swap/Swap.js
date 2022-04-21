@@ -11,8 +11,9 @@ const Swap = (props) => {
   //
   //
   //
-  const oldStructContract = "0x1A46Dd62c4CC8639562E907E3718b099E05AD27E";
-  const newStructContract = "0xB972D8f16C6e3152f12D424880B9737de0151193";
+  const oldStructContract = "0x053502bF08B7D3a54891bB66Fb966eA4C4bA7d02";
+  const newStructContract = "0x230339760A90AfA220206b92B312c1aaa288ECd5";
+  const mintCID = "ipfs://QmRFCGar2zMMW75RpvkNXJDtYVe4s8CHUk691DFVnd8kTr/";
 
   //states
   //
@@ -91,7 +92,12 @@ const Swap = (props) => {
 
       try {
         //debugger;
-        const response = await contract.swap(oldStructContract, tokenId);
+        const tokenURI = tokenId.map((token) => `${mintCID}${token}.json`);
+        const response = await contract.swap(
+          oldStructContract,
+          tokenId,
+          tokenURI
+        );
         response.wait().then((data) => {
           handleIds();
           props.swapFunc();

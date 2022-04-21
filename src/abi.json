@@ -96,24 +96,6 @@
         "type": "string"
       }
     ],
-    "name": "genToken",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_mintAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "_tokenURI",
-        "type": "string"
-      }
-    ],
     "name": "mintToken",
     "outputs": [],
     "stateMutability": "payable",
@@ -169,6 +151,11 @@
         "internalType": "contract IERC20",
         "name": "legendToken",
         "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "_tokenURI",
+        "type": "string"
       }
     ],
     "name": "randMint",
@@ -317,19 +304,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_address",
-        "type": "address"
-      }
-    ],
-    "name": "setnftBank",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "anonymous": false,
     "inputs": [
       {
@@ -353,6 +327,11 @@
         "internalType": "uint256[]",
         "name": "tokenIds",
         "type": "uint256[]"
+      },
+      {
+        "internalType": "string[]",
+        "name": "_tokenURI",
+        "type": "string[]"
       }
     ],
     "name": "swap",
