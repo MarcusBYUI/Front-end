@@ -604,9 +604,7 @@ const Kingdom = (props) => {
                   No Land to Stake
                 </h2>
               ) : (
-                stakeArray.map((item, index) => (
-                  <img key={index} src={item} alt={index} />
-                ))
+                stakeArray
               )}
               <button
                 className=" rounded-md bg-[#FEDC8C] px-4 py-2"
@@ -625,9 +623,7 @@ const Kingdom = (props) => {
                   No Staked Land
                 </h2>
               ) : (
-                stakeArray.map((item, index) => (
-                  <img key={index} src={item} alt={index} />
-                ))
+                stakeArray
               )}
               <button
                 className="mb-4 rounded-md bg-[#FEDC8C] px-4 py-2"
