@@ -87,7 +87,11 @@ const Swap = (props) => {
     if (window.ethereum) {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
-      const contract = new ethers.Contract(oldStructContract, bolAbi, signer);
+      const contract = new ethers.Contract(
+        oldStructContract,
+        oldbolAbi,
+        signer
+      );
 
       try {
         //debugger;
@@ -107,7 +111,11 @@ const Swap = (props) => {
     if (window.ethereum) {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
-      const contract = new ethers.Contract(oldStructContract, bolAbi, signer);
+      const contract = new ethers.Contract(
+        oldStructContract,
+        oldbolAbi,
+        signer
+      );
       const address = await signer.getAddress().then((response) => {
         return response;
       });
