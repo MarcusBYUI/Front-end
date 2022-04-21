@@ -1,6 +1,7 @@
 import { React, useState, useEffect } from "react";
 import { ethers, BigNumber } from "ethers";
-import bolAbi from "../../../../oldabi.json";
+import oldbolAbi from "../../../../oldabi.json";
+import bolAbi from "../../../../abi.json";
 
 import "./style.css";
 
@@ -35,7 +36,11 @@ const Swap = (props) => {
     if (window.ethereum) {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
-      const contract = new ethers.Contract(oldStructContract, bolAbi, signer);
+      const contract = new ethers.Contract(
+        oldStructContract,
+        oldbolAbi,
+        signer
+      );
       const address = await signer.getAddress().then((response) => {
         return response;
       });
