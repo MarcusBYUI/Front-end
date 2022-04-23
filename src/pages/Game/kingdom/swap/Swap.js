@@ -166,7 +166,6 @@ const Swap = (props) => {
   useEffect(() => {
     checkApprove();
     handleIds();
-    console.log(tokenId);
   }, []);
 
   // Return

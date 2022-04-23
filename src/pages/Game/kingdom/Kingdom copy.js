@@ -47,9 +47,9 @@ const Kingdom = (props) => {
     { idUser: "0xE416", value: "-", tag: "$LEGEND" },
   ]);
 
-  const legendContract = "0x3CBef762A500968986E3410a94CbF8daA5cceC84";
-  const structContract = "0xE5BAcF109acE926f8352c8C7BaC8d7B678798583";
-  const bolstakingContract = "0x8F453A716e0AB1aD334792572babb402aAd26aaB";
+  const legendContract = "0xB6cEAdcd2A31F9d386111F3B3aeDcafCfCEF20e5";
+  const structContract = "0x3146fca6fF0433430031514153b30B76758a66Ed";
+  const bolstakingContract = "0x47703F31Cf4748143de02451FD49f203b597563D";
   const IMGBASEURL =
     "https://bol.mypinata.cloud/ipfs/QmbT92ijUi3iJXJv9zz1yJxMaRDkC9LyExUAQd8b5n3eie/";
 
