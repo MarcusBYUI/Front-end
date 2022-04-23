@@ -13,7 +13,7 @@ const Swap = (props) => {
   //
   //
   const oldStructContract = "0x053502bF08B7D3a54891bB66Fb966eA4C4bA7d02";
-  const newStructContract = "0xa9dAb1D58BFDcB34615585e5c0bBE70e00C59bbC";
+  const newStructContract = "0xE5BAcF109acE926f8352c8C7BaC8d7B678798583";
   const mintCID = "ipfs://QmRFCGar2zMMW75RpvkNXJDtYVe4s8CHUk691DFVnd8kTr/";
 
   //states
@@ -65,10 +65,23 @@ const Swap = (props) => {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
       const contract = new ethers.Contract(newStructContract, bolAbi, signer);
+      const oldContract = new ethers.Contract(
+        oldStructContract,
+        oldbolAbi,
+        signer
+      );
 
       try {
         //debugger;
-        const tokenURI = tokenId.map((token) => `${mintCID}${token}.json`);
+        //const oldtokenURI = await oldContract.tokenURI(371);
+        //const test = [21];
+        const tokenURI = await Promise.all(
+          tokenId.map(async (token) => {
+            const oldtokenURI = await oldContract.tokenURI(token);
+            return oldtokenURI;
+          })
+        );
+
         const response = await contract.swap(
           oldStructContract,
           tokenId,

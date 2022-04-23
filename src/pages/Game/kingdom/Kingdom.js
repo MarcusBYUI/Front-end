@@ -4,6 +4,7 @@ import erc20Abi from "../../../ERC20ABI.json";
 import stakingAbi from "../../../stakinABI.json";
 import bolAbi from "../../../abi.json";
 import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";
+import oldbolAbi from "../../../oldabi.json";
 
 import "./style.css";
 import Structures from "../../Landing-Page/Structures/index";
@@ -47,7 +48,7 @@ const Kingdom = (props) => {
   ]);
 
   const legendContract = "0x3CBef762A500968986E3410a94CbF8daA5cceC84";
-  const structContract = "0xa9dAb1D58BFDcB34615585e5c0bBE70e00C59bbC";
+  const structContract = "0xE5BAcF109acE926f8352c8C7BaC8d7B678798583";
   const bolstakingContract = "0x8F453A716e0AB1aD334792572babb402aAd26aaB";
   const IMGBASEURL =
     "https://bol.mypinata.cloud/ipfs/QmbT92ijUi3iJXJv9zz1yJxMaRDkC9LyExUAQd8b5n3eie/";
@@ -63,6 +64,10 @@ const Kingdom = (props) => {
   const [claimBalCheck, setClaimBalCheck] = useState(0);
   const [stakeIdTokenIdDic, setStakeIdTokenIdDic] = useState({});
   const [swapUpdated, setSwapUpdated] = useState(0);
+
+  //mapping ID to URI
+  const [walletMap, setWalletMap] = useState({});
+  const [stakeMap, setStakeMap] = useState({});
 
   //trigger after swap
   const afterSwapHandler = () => {
@@ -411,6 +416,89 @@ const Kingdom = (props) => {
     }
   };
 
+  const startURL = "https://bol.mypinata.cloud/ipfs/";
+
+  //get URL then fetch the json that has the images
+  const getWalletImage = async () => {
+    if (window.ethereum) {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(structContract, oldbolAbi, signer);
+
+      try {
+        const tokenURI = await Promise.all(
+          walletStructImages.map(async (token) => {
+            const oldtokenURI = await contract.tokenURI(token);
+            return oldtokenURI;
+          })
+        );
+        const FetchURI = await Promise.all(
+          tokenURI.map(async (ipfs) => {
+            return ipfs.replace("ipfs://", `${startURL}`);
+          })
+        );
+
+        const imageURI = await Promise.all(
+          FetchURI.map(async (link) => {
+            const response = await fetch(link);
+            const data = await response.json();
+            return data.image;
+          })
+        );
+        let idImgsDic = {};
+        for (let i = 0; i < walletStructImages.length; i++) {
+          idImgsDic[`${walletStructImages[i]}`] = imageURI[i];
+        }
+
+        // staking part
+        setWalletMap(idImgsDic);
+        //console.log(imageURI, "Na we");
+      } catch (error) {
+        console.log("error", error);
+      }
+    }
+  };
+  const getStakedImage = async () => {
+    if (window.ethereum) {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(structContract, oldbolAbi, signer);
+
+      try {
+        const tokenURI = await Promise.all(
+          stakedIdsList.map(async (token) => {
+            const oldtokenURI = await contract.tokenURI(token);
+            return oldtokenURI;
+          })
+        );
+        const FetchURI = await Promise.all(
+          tokenURI.map(async (ipfs) => {
+            return ipfs.replace("ipfs://", `${startURL}`);
+          })
+        );
+
+        const imageURI = await Promise.all(
+          FetchURI.map(async (link) => {
+            const response = await fetch(link);
+            const data = await response.json();
+            return data.image;
+          })
+        );
+
+        let idImgsDic = {};
+        for (let i = 0; i < stakedIdsList.length; i++) {
+          idImgsDic[`${stakedIdsList[i]}`] = imageURI[i];
+        }
+
+        console.log(idImgsDic);
+        setStakeMap(idImgsDic);
+        //console.log(imageURI, "Na we");
+      } catch (error) {
+        console.log("error", error);
+      }
+    }
+  };
+
   const handleIds = async () => {
     if (window.ethereum) {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -485,6 +573,7 @@ const Kingdom = (props) => {
         //end
         settokenId(idSet);
         setWalletStructImages(idSet);
+        //getStakedImage();
         //generateTokenIdsFromStakeIds();
       } catch (error) {
         console.log("error", error);
@@ -529,14 +618,25 @@ const Kingdom = (props) => {
   // };
   //Use Effects
   //
-  //
-  //
-  //
+
   //
   // update claim
   // useEffect(() => {
   //   structureStakedCount > 0 && fakeIntervalAddition(structureStakedCount);
   // }, [fakeClaimBalCheck]);
+
+  //to fetch images
+  useEffect(() => {
+    getWalletImage();
+  }, [walletStructImages]);
+  useEffect(() => {
+    console.log("time");
+
+    setTimeout(() => {
+      Object.keys(stakedIdsList).length > 0 && getStakedImage();
+    }, 5000);
+  }, [stakedIdsList]);
+
   useEffect(() => {
     pendingClaim();
   }, [claimBalCheck]);
@@ -558,7 +658,6 @@ const Kingdom = (props) => {
   // }, [stakeIds]);
 
   useEffect(() => {
-    console.log("i got triggered");
     handleIds();
     //generateTokenIdsFromStakeIds();
     pendingClaim();
@@ -697,7 +796,7 @@ const Kingdom = (props) => {
                           walletCurImage && (
                           <img
                             key={walletStructImages.indexOf(item)}
-                            src={IMGBASEURL + item + ".png"}
+                            src={walletMap[item]}
                             alt={item}
                           />
                         )}
@@ -746,7 +845,7 @@ const Kingdom = (props) => {
                         {stakedIdsList.indexOf(item) === stakedCurImage && (
                           <img
                             key={stakedIdsList.indexOf(item)}
-                            src={IMGBASEURL + item + ".png"}
+                            src={stakeMap[item]}
                             alt={item}
                           />
                         )}
