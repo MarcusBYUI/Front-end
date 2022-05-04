@@ -14,9 +14,9 @@ const images = ImageBundleImport(
 );
 const imgLinks = Object.values(images);
 
-const structContract = "0xE5BAcF109acE926f8352c8C7BaC8d7B678798583";
+const structContract = "0x01dc3387edfa21add33abfdd9a37546cf64a8f92";
 
-const legendAddress = "0x3CBef762A500968986E3410a94CbF8daA5cceC84";
+const legendAddress = "0xB6cEAdcd2A31F9d386111F3B3aeDcafCfCEF20e5";
 
 const Minting = () => {
   //// check approve

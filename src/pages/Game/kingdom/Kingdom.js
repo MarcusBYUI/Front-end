@@ -47,9 +47,9 @@ const Kingdom = (props) => {
     { idUser: "0xE416", value: "-", tag: "$LEGEND" },
   ]);
 
-  const legendContract = "0x3CBef762A500968986E3410a94CbF8daA5cceC84";
-  const structContract = "0xE5BAcF109acE926f8352c8C7BaC8d7B678798583";
-  const bolstakingContract = "0x8F453A716e0AB1aD334792572babb402aAd26aaB";
+  const legendContract = "0xB6cEAdcd2A31F9d386111F3B3aeDcafCfCEF20e5";
+  const structContract = "0x01dC3387EdFA21ADd33ABFdd9a37546cF64a8f92";
+  const bolstakingContract = "0x4B5326A77E3F22b5760d0318cb2D08c1083039A1";
   const IMGBASEURL =
     "https://bol.mypinata.cloud/ipfs/QmbT92ijUi3iJXJv9zz1yJxMaRDkC9LyExUAQd8b5n3eie/";
 
@@ -523,34 +523,19 @@ const Kingdom = (props) => {
         const lastStakeIds = [...ids];
 
         //debugger;
-        const changedIds = await contract.ownershipChangeIds(address);
-        const mintIds = await contract.getIds(address);
-        changedIds.forEach(function (element) {
-          const num = BigNumber.from(element._hex).toNumber();
-          idSet.push(num);
-        });
-        mintIds.forEach(function (element) {
-          const num = BigNumber.from(element._hex).toNumber();
-          idSet.push(num);
-        });
-
-        //filter Ids
-        for (let i = 0; i <= idSet.length; i++) {
-          let count = 0;
-          let num = idSet[i];
-          idSet.forEach((element) => {
-            if (element === num) {
-              count++;
-
-              if (count === 2) {
-                idSet.splice(idSet.indexOf(element), 1);
-                idSet.splice(idSet.indexOf(element), 1);
-                count = 0;
-                i -= 2;
-              }
-            }
-          });
+        const balanceOf = await contract.balanceOf(address);
+        async function loop() {
+          for (let i = 0; i < balanceOf; i++) {
+            const walletTokenId = await contract.tokenOfOwnerByIndex(
+              address,
+              i
+            );
+            idSet.push(BigNumber.from(walletTokenId).toString());
+          }
         }
+
+        await loop();
+
         //End Of Filter
         // staked Ids
 
@@ -571,6 +556,7 @@ const Kingdom = (props) => {
         setstakedIdsList(IdList);
 
         //end
+        console.log(IdList);
         settokenId(idSet);
         setWalletStructImages(idSet);
         //getStakedImage();
@@ -683,7 +669,7 @@ const Kingdom = (props) => {
         $LEGEND in your wallet: {legendCount}
       </h2>
 
-      <Swap swapFunc={afterSwapHandler} />
+      {/* <Swap swapFunc={afterSwapHandler} /> */}
 
       <div className="border-div m-auto mt-10 grid min-h-[100vh] w-[90%] grid-cols-1 place-content-center place-items-center gap-4 pb-4 sm:mt-20 sm:w-4/5  md:w-[95%] md:grid-cols-2 md:grid-rows-3 lg:grid-cols-3 lg:grid-rows-2 lg:gap-x-10 xl:w-3/4">
         <div className='relative flex min-h-[36rem] w-full items-center justify-center bg-[url("/src/Assets/Borders-lg.png")] bg-[length:100%_100%]'>
