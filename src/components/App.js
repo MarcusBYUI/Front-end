@@ -18,6 +18,8 @@ import WhitepaperPdf from "../pages/Landing-Page/Whitepaper/PDFView";
 import "./App.css";
 import Minting from "../pages/Game/minting/Minting";
 import Kingdom from "../pages/Game/kingdom/Kingdom";
+import Upgrades from "../pages/Game/upgrades/upgrades";
+
 import Team from "../pages/Team/Team";
 
 function App() {
@@ -46,6 +48,7 @@ function App() {
           <Route path="/read-whitepaper" element={<WhitepaperPdf />} />
           <Route path="/minting" element={<Minting />} />
           <Route path="/my_kingdom" element={<Kingdom />} />
+          <Route path="/upgrades" element={<Upgrades />} />
           <Route path="/team" element={<Team />} />
         </Routes>
       </div>

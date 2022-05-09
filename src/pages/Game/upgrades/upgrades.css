@@ -1,0 +1,31 @@
+.upgrades-body {
+  background-image: url("../../../Assets/WhitepaperImg.jpeg");
+  min-height: 300px;
+  object-fit: cover;
+  padding-top: 160px;
+}
+
+.upgrades-header h1 {
+  color: #fedc8c;
+  font-size: 80px;
+}
+
+.upgrades-header h2 {
+  color: #fff;
+  font-size: 30px;
+  font-family: "Source Sans Pro", "Arial", san-serif;
+}
+
+.upgrades-grid h2 {
+  font-family: "Source Sans Pro", "Arial", san-serif;
+}
+
+.upgrades-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-width: 1000px;
+  margin: 0 auto;
+  margin-top: 45px;
+  padding-bottom: 45px;
+  grid-gap: 200px;
+}
