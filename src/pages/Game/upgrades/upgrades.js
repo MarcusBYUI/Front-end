@@ -5,23 +5,22 @@ import stakingAbi from "../../../stakinABI.json";
 import bolAbi from "../../../abi.json";
 import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";
 import oldbolAbi from "../../../oldabi.json";
+import Levels from "./upgrades.json";
 
 import "./upgrades.css";
 
 const Upgrades = () => {
   const legendContract = "0xB6cEAdcd2A31F9d386111F3B3aeDcafCfCEF20e5";
-  const structContract = "0xEa7e0f9D35dB45ec28447eB99CCb966CFB7E7d8E";
+  const structContract = "0xAba001Cf372b421C79F6e526586C1E333Fd152D7";
   const bolstakingContract = "0x4B5326A77E3F22b5760d0318cb2D08c1083039A1";
   const IMGBASEURL =
     "https://bol.mypinata.cloud/ipfs/QmbT92ijUi3iJXJv9zz1yJxMaRDkC9LyExUAQd8b5n3eie/";
 
-  const [structureStakedCount, setStructureStakedCount] = useState(0);
-  const [availableStructCount, setAvailableStructCount] = useState(0);
+  const [structureUpgradingCount, setStructureUpgradingCount] = useState(0);
+  const [availableStructCount, setAvailableStructCount] = useState([]);
   const [approved, setApproved] = useState(false);
   const [stakeIds, setStakeIds] = useState([]);
   const [tokenId, settokenId] = useState([]);
-  const [stakeClick, setStakeClick] = useState(0);
-  const [unStakeClick, setUnStakeClick] = useState(0);
   const [walletMap, setWalletMap] = useState({});
   const [stakeMap, setStakeMap] = useState({});
 
@@ -80,7 +79,7 @@ const Upgrades = () => {
         //get balance of structs in wallet
         const balanceOf = await contract.balanceOf(address);
         async function loop() {
-          for (let i = 0; i < balanceOf; i++) {
+          for (let i = 0; i < BigNumber.from(balanceOf).toString(); i++) {
             const walletTokenId = await contract.tokenOfOwnerByIndex(
               address,
               i
@@ -92,9 +91,7 @@ const Upgrades = () => {
         await loop();
 
         //get ongoing upgrades
-        console.log("wallet Bal");
-        //const isUpgradingBalance = await contract.upgradingBalance(address);
-        const isUpgradingBalance = 1;
+        const isUpgradingBalance = await contract.upgradingBalance(address);
 
         const upgradingSet = [];
 
@@ -105,10 +102,18 @@ const Upgrades = () => {
           }
         }
 
-        await loop();
+        await upgradingloop();
+        async function filterArray() {
+          for (let i = 0; i < upgradingSet.length; i++) {
+            if (!idSet.includes(upgradingSet[i])) {
+              idSet.splice(idSet.indexOf(upgradingSet[i]), 1);
+            }
+          }
+        }
 
-        console.log("wallet Bal", idSet);
-        console.log("upgrading Bal", upgradingSet);
+        await filterArray();
+
+        setAvailableStructCount(idSet);
       } catch (error) {
         console.log("error", error);
       }
@@ -116,7 +121,7 @@ const Upgrades = () => {
   };
 
   const prevSlide = () => {
-    const length = walletStructImages.length;
+    const length = availableStructCount.length;
 
     setupgradeableCurImage(
       upgradeableCurImage === 0 ? length - 1 : upgradeableCurImage - 1
@@ -124,7 +129,7 @@ const Upgrades = () => {
   };
 
   const nextSlide = () => {
-    const length = walletStructImages.length;
+    const length = availableStructCount.length;
     setupgradeableCurImage(
       upgradeableCurImage === length - 1 ? 0 : upgradeableCurImage + 1
     );
@@ -158,7 +163,29 @@ const Upgrades = () => {
   //
 
   const startURL = "https://bol.mypinata.cloud/ipfs/";
-
+  const decideLevel = (string) => {
+    if (string.includes("QmXTg1LCuKJ83njDyVJeLvtFjpWDTog5n9UKLv1Gt9xPVZ")) {
+      return 1;
+    } else if (
+      string.includes("QmWjJhcQmDFSewnKz8AAdy98D8DKo7dMRPWTw991HnXB41")
+    ) {
+      return 2;
+    } else if (
+      string.includes("QmSFQLRVEFEK1kcQ5NVz4h1iyrBDR9zwvJJuDEKDrAb2VP")
+    ) {
+      return 3;
+    } else if (
+      string.includes("QmQk7z9eoe5RaJtEW2cqbEnCwnwUcESsgV8nYKvKJkqJqz")
+    ) {
+      return 4;
+    } else if (
+      string.includes("QmTKfoKReK4VkZnirNAWHziiTjXtqgREskHmzH2EJfBkVT")
+    ) {
+      return 5;
+    } else {
+      return 0;
+    }
+  };
   //get URL then fetch the json that has the images
   const getWalletImage = async () => {
     if (window.ethereum) {
@@ -168,7 +195,7 @@ const Upgrades = () => {
 
       try {
         const tokenURI = await Promise.all(
-          walletStructImages.map(async (token) => {
+          availableStructCount.map(async (token) => {
             const oldtokenURI = await contract.tokenURI(token);
             return oldtokenURI;
           })
@@ -179,21 +206,28 @@ const Upgrades = () => {
           })
         );
 
-        const imageURI = await Promise.all(
+        const TokenList = [];
+
+        const test = await Promise.all(
           FetchURI.map(async (link) => {
             const response = await fetch(link);
             const data = await response.json();
-            return data.image;
+            const dic = {};
+            dic["name"] = data.attributes[1].value;
+            dic["image"] = data.image;
+            dic["level"] = decideLevel(link);
+
+            TokenList.push(dic);
           })
         );
+
         let idImgsDic = {};
-        for (let i = 0; i < walletStructImages.length; i++) {
-          idImgsDic[`${walletStructImages[i]}`] = imageURI[i];
+        for (let i = 0; i < availableStructCount.length; i++) {
+          idImgsDic[`${availableStructCount[i]}`] = TokenList[i];
         }
 
-        // staking part
         setWalletMap(idImgsDic);
-        //console.log(imageURI, "Na we");
+        console.log(idImgsDic);
       } catch (error) {
         console.log("error", error);
       }
@@ -303,7 +337,7 @@ const Upgrades = () => {
         });
         setStakeIds([...ids]);
 
-        setStructureStakedCount(ids.length);
+        //setStructureStakedCount(ids.length);
       } catch (error) {
         console.log("error", error);
       }
@@ -332,7 +366,7 @@ const Upgrades = () => {
           );
           response.wait().then((data) => {
             // update the front end bal before the blockchain data returns
-            setStructureStakedCount((prevState) => prevState + 1);
+            //setStructureStakedCount((prevState) => prevState + 1);
             setAvailableStructCount((prevState) => prevState - 1);
             // structBalanceHandler();
             // checkStakedStruct();
@@ -376,8 +410,15 @@ const Upgrades = () => {
   //
 
   useEffect(() => {
-    handleIds();
-    checkApproved();
+    getWalletImage();
+  }, [availableStructCount]);
+
+  useEffect(() => {
+    const reload = async () => {
+      await handleIds();
+      await checkApproved();
+    };
+    reload();
   }, []);
   //
 
@@ -445,51 +486,113 @@ const Upgrades = () => {
               Upgradeable
             </h2>
             <div className="my-2">
-              {"availableStructCount" === 0 ? (
+              {availableStructCount.length === 0 ? (
                 <h2 className="mb-4 bg-[#FEDC8C] text-2xl font-bold text-black md:text-base">
-                  {"availableStructCount" || "No Structure to Stake"}
+                  {"No Upgradeable Structures"}
                 </h2>
               ) : (
                 <section className="slider-container">
                   <FaArrowAltCircleLeft
                     className="left-arrow"
-                    onClick={"prevSlide"}
+                    onClick={prevSlide}
                   />
-                  {walletStructImages.map((item) => {
+                  {availableStructCount.map((item) => {
                     return (
                       <div
                         className={
-                          walletStructImages.indexOf(item) ===
+                          availableStructCount.indexOf(item) ===
                           upgradeableCurImage
-                            ? "  active"
+                            ? "active"
                             : "slide"
                         }
                       >
-                        {walletStructImages.indexOf(item) ===
-                          upgradeableCurImage && (
-                          <img
-                            key={walletStructImages.indexOf(item)}
-                            src={walletMap[item]}
-                            alt={item}
-                          />
-                        )}
+                        {Object.keys(walletMap).length !== 0 &&
+                          availableStructCount.indexOf(item) ===
+                            upgradeableCurImage && (
+                            <>
+                              <img
+                                key={walletStructImages.indexOf(item)}
+                                src={walletMap[item].image}
+                                alt={item}
+                              />
+                              <p>
+                                Name:{walletMap[item].name}
+                                <strong>{console.log(walletMap[item])}</strong>
+                              </p>
+                              <p>
+                                Level: <strong>{walletMap[item].level}</strong>
+                              </p>
+                              <p>
+                                Current Yield:{" "}
+                                <strong>
+                                  {
+                                    Levels[walletMap[item].name][
+                                      walletMap[item].level
+                                    ].curYield
+                                  }
+                                </strong>
+                              </p>
+                              {walletMap[item].level === 5 ? (
+                                <p>
+                                  <strong>Levels Maxed!!!</strong>
+                                </p>
+                              ) : (
+                                <>
+                                  <p>
+                                    Upgrade Time:{" "}
+                                    <strong>
+                                      {
+                                        Levels[walletMap[item].name][
+                                          walletMap[item].level
+                                        ].duration
+                                      }
+                                    </strong>{" "}
+                                    days
+                                  </p>
+                                  <p>
+                                    Upgrade Cost:{" "}
+                                    <strong>
+                                      {
+                                        Levels[walletMap[item].name][
+                                          walletMap[item].level
+                                        ].cost
+                                      }
+                                    </strong>{" "}
+                                    $LGD
+                                  </p>
+                                  <p>
+                                    Upgraded Yield:{" "}
+                                    <strong>
+                                      {
+                                        Levels[walletMap[item].name][
+                                          walletMap[item].level
+                                        ].furYield
+                                      }
+                                    </strong>{" "}
+                                    $LGD
+                                  </p>
+                                  <button
+                                    className="mb-4 rounded-md bg-[#FEDC8C] px-4 py-2"
+                                    //onClick={stakeClickHandler}
+                                  >
+                                    {"approved" === true
+                                      ? "Stake Structure"
+                                      : "Approve Structure"}
+                                  </button>
+                                </>
+                              )}
+                            </>
+                          )}
                       </div>
                     );
                   })}
 
-                  <img src={IMGBASEURL + 1 + ".png"} alt="" />
                   <FaArrowAltCircleRight
                     className="right-arrow"
-                    onClick={"nextSlide"}
+                    onClick={nextSlide}
                   />
                 </section>
               )}
-              <button
-                className="mb-4 rounded-md bg-[#FEDC8C] px-4 py-2"
-                onClick={"stakeClickHandler"}
-              >
-                {"approved" === true ? "Stake Structure" : "Approve Structure"}
-              </button>
             </div>
             <div className="h-[0.1rem] w-11/12 bg-slate-900"></div>
             <h2 className="my-2 ml-4 self-start text-2xl font-bold md:text-base">
@@ -536,7 +639,7 @@ const Upgrades = () => {
               <button
                 className="mb-4 rounded-md bg-[#FEDC8C] px-4 py-2"
                 onClick={
-                  Number(structureStakedCount) > 0
+                  Number("structureStakedCount") > 0
                     ? "unStakeClickHandler"
                     : () => {}
                 }

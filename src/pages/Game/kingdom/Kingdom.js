@@ -48,7 +48,7 @@ const Kingdom = (props) => {
   ]);
 
   const legendContract = "0xB6cEAdcd2A31F9d386111F3B3aeDcafCfCEF20e5";
-  const structContract = "0x01dC3387EdFA21ADd33ABFdd9a37546cF64a8f92";
+  const structContract = "0xAba001Cf372b421C79F6e526586C1E333Fd152D7";
   const bolstakingContract = "0x4B5326A77E3F22b5760d0318cb2D08c1083039A1";
   const IMGBASEURL =
     "https://bol.mypinata.cloud/ipfs/QmbT92ijUi3iJXJv9zz1yJxMaRDkC9LyExUAQd8b5n3eie/";

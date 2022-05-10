@@ -1,0 +1,67 @@
+{
+  "Town Hall": {
+    "0": { "duration": 5, "cost": "5,000", "curYield": 125, "furYield": 137 },
+    "1": { "duration": 5, "cost": "10,000", "curYield": 137, "furYield": 150 },
+    "2": { "duration": 5, "cost": "20,000", "curYield": 150, "furYield": 165 },
+    "3": { "duration": 5, "cost": "30,000", "curYield": 165, "furYield": 180 },
+    "4": { "duration": 5, "cost": "60,000", "curYield": 180, "furYield": 200 },
+    "5": { "duration": 0, "cost": 0, "curYield": 200, "furYield": 0 }
+  },
+
+  "Barrack": {
+    "0": { "duration": 1, "cost": "5,000", "curYield": 150, "furYield": 165 },
+    "1": { "duration": 2, "cost": "5,000", "curYield": 165, "furYield": 180 },
+    "2": { "duration": 3, "cost": "5,000", "curYield": 180, "furYield": 200 },
+    "3": { "duration": 4, "cost": "5,000", "curYield": 200, "furYield": 220 },
+    "4": { "duration": 5, "cost": "5,000", "curYield": 220, "furYield": 245 },
+    "5": { "duration": 0, "cost": 0, "curYield": 245, "furYield": 0 }
+  },
+  "Dragon Pit": {
+    "0": { "duration": 5, "cost": "10,000", "curYield": 500, "furYield": 550 },
+    "1": { "duration": 5, "cost": "20,000", "curYield": 550, "furYield": 605 },
+    "2": { "duration": 5, "cost": "30,000", "curYield": 605, "furYield": 665 },
+    "3": { "duration": 5, "cost": "40,000", "curYield": 665, "furYield": 730 },
+    "4": { "duration": 5, "cost": "80,000", "curYield": 730, "furYield": 800 },
+    "5": { "duration": 0, "cost": 0, "curYield": 800, "furYield": 0 }
+  },
+  "Defense Wall": {
+    "0": { "duration": 2, "cost": "5,000", "curYield": 250, "furYield": 275 },
+    "1": { "duration": 3, "cost": "10,000", "curYield": 275, "furYield": 300 },
+    "2": { "duration": 4, "cost": "15,000", "curYield": 300, "furYield": 330 },
+    "3": { "duration": 5, "cost": "20,000", "curYield": 330, "furYield": 365 },
+    "4": { "duration": 5, "cost": "40,000", "curYield": 365, "furYield": 400 },
+    "5": { "duration": 0, "cost": 0, "curYield": 400, "furYield": 0 }
+  },
+  "Wizard": {
+    "0": { "duration": 4, "cost": "8,000", "curYield": 350, "furYield": 385 },
+    "1": { "duration": 4, "cost": "16,000", "curYield": 385, "furYield": 425 },
+    "2": { "duration": 4, "cost": "24,000", "curYield": 425, "furYield": 465 },
+    "3": { "duration": 4, "cost": "32,000", "curYield": 465, "furYield": 510 },
+    "4": { "duration": 5, "cost": "64,000", "curYield": 510, "furYield": 560 },
+    "5": { "duration": 0, "cost": 0, "curYield": 560, "furYield": 0 }
+  },
+  "Archer Tower": {
+    "0": { "duration": 2, "cost": "5,000", "curYield": 250, "furYield": 275 },
+    "1": { "duration": 3, "cost": "10,000", "curYield": 275, "furYield": 300 },
+    "2": { "duration": 4, "cost": "15,000", "curYield": 300, "furYield": 330 },
+    "3": { "duration": 5, "cost": "20,000", "curYield": 330, "furYield": 365 },
+    "4": { "duration": 5, "cost": "40,000", "curYield": 365, "furYield": 400 },
+    "5": { "duration": 0, "cost": 0, "curYield": 400, "furYield": 0 }
+  },
+  "Workshop": {
+    "0": { "duration": 1.5, "cost": "3,000", "curYield": 175, "furYield": 192 },
+    "1": { "duration": 2, "cost": "6,000", "curYield": 192, "furYield": 210 },
+    "2": { "duration": 3, "cost": "9,000", "curYield": 210, "furYield": 230 },
+    "3": { "duration": 4, "cost": "12,000", "curYield": 230, "furYield": 255 },
+    "4": { "duration": 5, "cost": "24,000", "curYield": 255, "furYield": 280 },
+    "5": { "duration": 0, "cost": 0, "curYield": 280, "furYield": 0 }
+  },
+  "Builder": {
+    "0": { "duration": 1.5, "cost": "3,000", "curYield": 175, "furYield": 192 },
+    "1": { "duration": 2, "cost": "6,000", "curYield": 192, "furYield": 210 },
+    "2": { "duration": 3, "cost": "9,000", "curYield": 210, "furYield": 230 },
+    "3": { "duration": 4, "cost": "12,000", "curYield": 230, "furYield": 255 },
+    "4": { "duration": 5, "cost": "24,000", "curYield": 255, "furYield": 280 },
+    "5": { "duration": 0, "cost": 0, "curYield": 280, "furYield": 0 }
+  }
+}
