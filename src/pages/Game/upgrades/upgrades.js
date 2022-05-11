@@ -11,18 +11,20 @@ import "./upgrades.css";
 
 const Upgrades = () => {
   const legendContract = "0xB6cEAdcd2A31F9d386111F3B3aeDcafCfCEF20e5";
-  const structContract = "0xAba001Cf372b421C79F6e526586C1E333Fd152D7";
+  const structContract = "0xBCA70C6126054ED27f996d0655E2cBa5669b07EB";
   const bolstakingContract = "0x4B5326A77E3F22b5760d0318cb2D08c1083039A1";
   const IMGBASEURL =
     "https://bol.mypinata.cloud/ipfs/QmbT92ijUi3iJXJv9zz1yJxMaRDkC9LyExUAQd8b5n3eie/";
 
-  const [structureUpgradingCount, setStructureUpgradingCount] = useState(0);
+  const [structureUpgradingCount, setStructureUpgradingCount] = useState([]);
   const [availableStructCount, setAvailableStructCount] = useState([]);
   const [approved, setApproved] = useState(false);
   const [stakeIds, setStakeIds] = useState([]);
   const [tokenId, settokenId] = useState([]);
   const [walletMap, setWalletMap] = useState({});
-  const [stakeMap, setStakeMap] = useState({});
+  const [upgradingMap, setUpgradingMap] = useState({});
+  const [timerState, setTimerState] = useState({});
+  const [tokenTimer, setTokenTimer] = useState({});
 
   const [walletStructImages, setWalletStructImages] = useState([]);
   const [upgradeableCurImage, setupgradeableCurImage] = useState(0);
@@ -96,22 +98,29 @@ const Upgrades = () => {
         const upgradingSet = [];
 
         async function upgradingloop() {
-          for (let i = 0; i < isUpgradingBalance; i++) {
+          for (
+            let i = 0;
+            i < BigNumber.from(isUpgradingBalance).toString();
+            i++
+          ) {
             const upgradingTokenId = await contract.isUpgrading(address, i);
-            upgradingSet.push(BigNumber.from(upgradingTokenId).toString());
+            BigNumber.from(upgradingTokenId).toString() !== "0" &&
+              upgradingSet.push(BigNumber.from(upgradingTokenId).toString());
           }
         }
 
         await upgradingloop();
         async function filterArray() {
           for (let i = 0; i < upgradingSet.length; i++) {
-            if (!idSet.includes(upgradingSet[i])) {
+            if (idSet.includes(upgradingSet[i])) {
               idSet.splice(idSet.indexOf(upgradingSet[i]), 1);
             }
           }
         }
 
         await filterArray();
+
+        setStructureUpgradingCount(upgradingSet);
 
         setAvailableStructCount(idSet);
       } catch (error) {
@@ -145,16 +154,16 @@ const Upgrades = () => {
   const [pendingIdsList, setpendingIdsList] = useState([]);
   const [pendingCurImage, setpendingCurImage] = useState(0);
 
-  const prevStakedSlide = () => {
-    const length = pendingIdsList.length;
+  const prevPendingSlide = () => {
+    const length = structureUpgradingCount.length;
 
     setpendingCurImage(
       pendingCurImage === 0 ? length - 1 : pendingCurImage - 1
     );
   };
 
-  const nextStakedSlide = () => {
-    const length = pendingIdsList.length;
+  const nextPendingSlide = () => {
+    const length = structureUpgradingCount.length;
     setpendingCurImage(
       pendingCurImage === length - 1 ? 0 : pendingCurImage + 1
     );
@@ -227,44 +236,89 @@ const Upgrades = () => {
         }
 
         setWalletMap(idImgsDic);
-        console.log(idImgsDic);
       } catch (error) {
         console.log("error", error);
       }
     }
   };
-  const getStakedImage = async () => {
+
+  const timeInterval = (when = false) => {
+    if (Object.keys(timerState).length === 0) {
+    } else {
+      const timer = {};
+
+      structureUpgradingCount.forEach((structure) => {
+        const curTime = new Date().getTime();
+        const futureTime = timerState[structure];
+
+        const distance = futureTime - curTime;
+        let days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        let hours = Math.floor(
+          (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+        );
+        let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        timer[structure] = [days, hours, minutes, seconds];
+      });
+
+      setTokenTimer(timer);
+    }
+  };
+  const getUpgradingImage = async () => {
     if (window.ethereum) {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
       const contract = new ethers.Contract(structContract, oldbolAbi, signer);
+      const newContract = new ethers.Contract(structContract, bolAbi, signer);
 
       try {
-        // const tokenURI = await Promise.all(
-        //   stakedIdsList.map(async (token) => {
-        //     const oldtokenURI = await contract.tokenURI(token);
-        //     return oldtokenURI;
-        //   })
-        // );
-        // const FetchURI = await Promise.all(
-        //   tokenURI.map(async (ipfs) => {
-        //     return ipfs.replace("ipfs://", `${startURL}`);
-        //   })
-        // );
-        // const imageURI = await Promise.all(
-        //   FetchURI.map(async (link) => {
-        //     const response = await fetch(link);
-        //     const data = await response.json();
-        //     return data.image;
-        //   })
-        // );
-        // let idImgsDic = {};
-        // for (let i = 0; i < stakedIdsList.length; i++) {
-        //   idImgsDic[`${stakedIdsList[i]}`] = imageURI[i];
-        // }
-        // console.log(idImgsDic);
-        // setStakeMap(idImgsDic);
-        //console.log(imageURI, "Na we");
+        const tokenURI = await Promise.all(
+          structureUpgradingCount.map(async (token) => {
+            const oldtokenURI = await contract.tokenURI(token);
+            return oldtokenURI;
+          })
+        );
+        const FetchURI = await Promise.all(
+          tokenURI.map(async (ipfs) => {
+            return ipfs.replace("ipfs://", `${startURL}`);
+          })
+        );
+        const TokenList = [];
+        const timerList = [];
+        const test = await Promise.all(
+          FetchURI.map(async (link, index) => {
+            const response = await fetch(link);
+            const data = await response.json();
+
+            const chainResponse = await newContract.upgradeTimeleft(
+              structureUpgradingCount[index]
+            );
+
+            const FutureTime = BigNumber.from(chainResponse).toString();
+
+            const FutureTimeDate = new Date(FutureTime * 1000).getTime();
+
+            const dic = {};
+            dic["name"] = data.attributes[1].value;
+            dic["image"] = data.image;
+            TokenList.push(dic);
+            timerList.push(FutureTimeDate);
+          })
+        );
+
+        let idImgsDic = {};
+        let idTimerDic = {};
+
+        for (let i = 0; i < structureUpgradingCount.length; i++) {
+          idImgsDic[`${structureUpgradingCount[i]}`] = TokenList[i];
+          idTimerDic[`${structureUpgradingCount[i]}`] = timerList[i];
+        }
+
+        setTimerState(idTimerDic);
+        console.log(idTimerDic, idTimerDic);
+
+        setUpgradingMap(idImgsDic);
       } catch (error) {
         console.log("error", error);
       }
@@ -282,7 +336,6 @@ const Upgrades = () => {
       try {
         //debugger;
 
-        //console.log(await address);
         const balanceBig = await contract.balanceOf(address);
         const balance = ethers.utils.formatEther(balanceBig);
 
@@ -344,34 +397,22 @@ const Upgrades = () => {
     }
   };
 
-  const handleUpgradeFee = async () => {
+  const handleUpgrade = async (name, tokenId) => {
     if (Number(availableStructCount) < 1) {
     } else {
       if (window.ethereum) {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
-        const contract = new ethers.Contract(
-          bolstakingContract,
-          stakingAbi,
-          signer
-        );
-        //getRandomInt(availableStructCount);
-
+        const contract = new ethers.Contract(structContract, bolAbi, signer);
         try {
           //debugger;
-          const response = await contract.stake(
-            structContract,
-            //tokenId[walletCurImage],
+          const response = await contract.initializeUpgrade(
+            name,
+            tokenId,
             legendContract
           );
-          response.wait().then((data) => {
-            // update the front end bal before the blockchain data returns
-            //setStructureStakedCount((prevState) => prevState + 1);
-            setAvailableStructCount((prevState) => prevState - 1);
-            // structBalanceHandler();
-            // checkStakedStruct();
-            //generateTokenIdsFromStakeIds();
-          });
+          await response.wait();
+          await handleIds();
         } catch (error) {
           console.log("error", error);
         }
@@ -379,28 +420,57 @@ const Upgrades = () => {
     }
   };
 
-  const handleCompleteUpgrade = async () => {
+  const change = async (string) => {
+    if (string.includes("QmRFCGar2zMMW75RpvkNXJDtYVe4s8CHUk691DFVnd8kTr")) {
+      return string.replace(
+        "QmRFCGar2zMMW75RpvkNXJDtYVe4s8CHUk691DFVnd8kTr",
+        "QmXTg1LCuKJ83njDyVJeLvtFjpWDTog5n9UKLv1Gt9xPVZ"
+      );
+    } else if (
+      string.includes("QmXTg1LCuKJ83njDyVJeLvtFjpWDTog5n9UKLv1Gt9xPVZ")
+    ) {
+      return string.replace(
+        "QmXTg1LCuKJ83njDyVJeLvtFjpWDTog5n9UKLv1Gt9xPVZ",
+        "QmWjJhcQmDFSewnKz8AAdy98D8DKo7dMRPWTw991HnXB41"
+      );
+    } else if (
+      string.includes("QmWjJhcQmDFSewnKz8AAdy98D8DKo7dMRPWTw991HnXB41")
+    ) {
+      return string.replace(
+        "QmWjJhcQmDFSewnKz8AAdy98D8DKo7dMRPWTw991HnXB41",
+        "QmSFQLRVEFEK1kcQ5NVz4h1iyrBDR9zwvJJuDEKDrAb2VP"
+      );
+    } else if (
+      string.includes("QmSFQLRVEFEK1kcQ5NVz4h1iyrBDR9zwvJJuDEKDrAb2VP")
+    ) {
+      return string.replace(
+        "QmSFQLRVEFEK1kcQ5NVz4h1iyrBDR9zwvJJuDEKDrAb2VP",
+        "QmQk7z9eoe5RaJtEW2cqbEnCwnwUcESsgV8nYKvKJkqJqz"
+      );
+    } else if (
+      string.includes("QmQk7z9eoe5RaJtEW2cqbEnCwnwUcESsgV8nYKvKJkqJqz")
+    ) {
+      return string.replace(
+        "QmQk7z9eoe5RaJtEW2cqbEnCwnwUcESsgV8nYKvKJkqJqz",
+        "QmTKfoKReK4VkZnirNAWHziiTjXtqgREskHmzH2EJfBkVT"
+      );
+    }
+  };
+  const handleCompleteUpgrade = async (token) => {
     if (window.ethereum) {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
-      const contract = new ethers.Contract(
-        bolstakingContract,
-        stakingAbi,
-        signer
-      );
+      const contract = new ethers.Contract(structContract, bolAbi, signer);
 
       try {
-        //debugger;
-        // const response = await contract.unstake(
-        //   stakeIdTokenIdDic[stakedIdsList[stakedCurImage]]
-        // );
-        // response.wait().then((data) => {
-        //   setStructureStakedCount((prevState) => prevState - 1);
-        //   setAvailableStructCount((prevState) => prevState + 1);
-        //   structBalanceHandler();
-        //   checkStakedStruct();
-        //generateTokenIdsFromStakeIds();
-        //});
+        console.log(token);
+        const tokenURI = await contract.tokenURI(token);
+
+        const URI = await change(tokenURI);
+
+        const response = await contract.updateMetadata(token, URI);
+        await response.wait();
+        handleIds();
       } catch (error) {
         console.log("error", error);
       }
@@ -410,8 +480,16 @@ const Upgrades = () => {
   //
 
   useEffect(() => {
+    const interval = setInterval(() => {
+      timeInterval();
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timerState]);
+  useEffect(() => {
     getWalletImage();
-  }, [availableStructCount]);
+    getUpgradingImage();
+  }, [availableStructCount, structureUpgradingCount]);
 
   useEffect(() => {
     const reload = async () => {
@@ -419,7 +497,7 @@ const Upgrades = () => {
       await checkApproved();
     };
     reload();
-  }, []);
+  }, [approved]);
   //
 
   return (
@@ -511,13 +589,13 @@ const Upgrades = () => {
                             upgradeableCurImage && (
                             <>
                               <img
-                                key={walletStructImages.indexOf(item)}
+                                key={availableStructCount.indexOf(item)}
                                 src={walletMap[item].image}
                                 alt={item}
                               />
                               <p>
-                                Name:{walletMap[item].name}
-                                <strong>{console.log(walletMap[item])}</strong>
+                                Name:{""}
+                                <strong>{walletMap[item].name}</strong>
                               </p>
                               <p>
                                 Level: <strong>{walletMap[item].level}</strong>
@@ -573,10 +651,19 @@ const Upgrades = () => {
                                   </p>
                                   <button
                                     className="mb-4 rounded-md bg-[#FEDC8C] px-4 py-2"
-                                    //onClick={stakeClickHandler}
+                                    onClick={
+                                      approved === true
+                                        ? () => {
+                                            handleUpgrade(
+                                              walletMap[item].name,
+                                              item
+                                            );
+                                          }
+                                        : handleApprove
+                                    }
                                   >
-                                    {"approved" === true
-                                      ? "Stake Structure"
+                                    {approved === true
+                                      ? "Upgrade Structure"
                                       : "Approve Structure"}
                                   </button>
                                 </>
@@ -598,54 +685,67 @@ const Upgrades = () => {
             <h2 className="my-2 ml-4 self-start text-2xl font-bold md:text-base">
               Pending Upgrades
             </h2>
-            <div>
-              {"structureStakedCount" === 0 ? (
+            <div className="my-2">
+              {structureUpgradingCount.length === 0 ? (
                 <h2 className="mb-4 bg-[#FEDC8C] text-2xl font-bold text-black md:text-base">
-                  {"structureStakedCount" || "No Staked Structure"}
+                  {"No Pending Upgrades"}
                 </h2>
               ) : (
                 <section className="slider-container">
                   <FaArrowAltCircleLeft
                     className="left-arrow"
-                    onClick={prevStakedSlide}
+                    onClick={prevPendingSlide}
                   />
-                  {pendingIdsList.map((item) => {
+                  {structureUpgradingCount.map((item) => {
                     return (
                       <div
                         className={
-                          pendingIdsList.indexOf(item) === pendingCurImage
-                            ? "  active"
+                          structureUpgradingCount.indexOf(item) ===
+                          pendingCurImage
+                            ? "active"
                             : "slide"
                         }
                       >
-                        {pendingIdsList.indexOf(item) === pendingCurImage && (
-                          <img
-                            key={pendingIdsList.indexOf(item)}
-                            src={stakeMap[item]}
-                            alt={item}
-                          />
-                        )}
+                        {Object.keys(upgradingMap).length !== 0 &&
+                          Object.keys(tokenTimer).length &&
+                          structureUpgradingCount.indexOf(item) ===
+                            pendingCurImage && (
+                            <>
+                              <img
+                                key={structureUpgradingCount.indexOf(item)}
+                                src={upgradingMap[item].image}
+                                alt={item}
+                              />
+                              <p>
+                                Name:{""}
+                                <strong>{upgradingMap[item].name}</strong>
+                              </p>
+                              <button
+                                className="mb-4 rounded-md bg-[#FEDC8C] px-4 py-2"
+                                onClick={
+                                  tokenTimer[item][3] < 0
+                                    ? () => {
+                                        handleCompleteUpgrade(item);
+                                      }
+                                    : () => {}
+                                }
+                              >
+                                {tokenTimer[item][3] < 0
+                                  ? "Complete Upgrade"
+                                  : `${tokenTimer[item][0]}:${tokenTimer[item][1]}:${tokenTimer[item][2]}:${tokenTimer[item][3]}`}
+                              </button>
+                            </>
+                          )}
                       </div>
                     );
                   })}
 
-                  <img src={IMGBASEURL + 1 + ".png"} alt="" />
                   <FaArrowAltCircleRight
                     className="right-arrow"
-                    onClick={nextStakedSlide}
+                    onClick={nextPendingSlide}
                   />
                 </section>
               )}
-              <button
-                className="mb-4 rounded-md bg-[#FEDC8C] px-4 py-2"
-                onClick={
-                  Number("structureStakedCount") > 0
-                    ? "unStakeClickHandler"
-                    : () => {}
-                }
-              >
-                Unstake Structure
-              </button>
             </div>
           </div>
         </div>
