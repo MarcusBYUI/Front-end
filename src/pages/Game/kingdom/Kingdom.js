@@ -48,8 +48,8 @@ const Kingdom = (props) => {
   ]);
 
   const legendContract = "0xB6cEAdcd2A31F9d386111F3B3aeDcafCfCEF20e5";
-  const structContract = "0xAba001Cf372b421C79F6e526586C1E333Fd152D7";
-  const bolstakingContract = "0x4B5326A77E3F22b5760d0318cb2D08c1083039A1";
+  const structContract = "0xBCA70C6126054ED27f996d0655E2cBa5669b07EB";
+  const bolstakingContract = "0xfd328c0d6d644074F4C8C184D7173A99a651dFae";
   const IMGBASEURL =
     "https://bol.mypinata.cloud/ipfs/QmbT92ijUi3iJXJv9zz1yJxMaRDkC9LyExUAQd8b5n3eie/";
 
@@ -117,56 +117,7 @@ const Kingdom = (props) => {
     const length = stakedIdsList.length;
     setStakedCurImage(stakedCurImage === length - 1 ? 0 : stakedCurImage + 1);
   };
-  //
-  //
-  //
-  //
-  //
-  //
-  //
 
-  // const generateTokenIdsFromStakeIds = async () => {
-  //   if (window.ethereum) {
-  //     const provider = new ethers.providers.Web3Provider(window.ethereum);
-  //     const signer = provider.getSigner();
-  //     const contract = new ethers.Contract(
-  //       bolstakingContract,
-  //       stakingAbi,
-  //       signer
-  //     );
-  //     const address = await signer.getAddress().then(function (response) {
-  //       return response;
-  //     });
-  //     try {
-  //       //debugger;
-  //       const stakeIds = await contract.staked(address);
-  //       let ids = [];
-
-  //       await stakeIds.forEach(function (element) {
-  //         ids.push(element.stakeId);
-  //       });
-  //       const lastStakeIds = [...ids];
-
-  //       //debugger;
-
-  //       //console.log(await address);
-  //       // get ids and keypair of mapping
-  //       let newdic = {};
-  //       let IdList = [];
-  //       lastStakeIds.forEach(async (stakeid) => {
-  //         const tokenId = await contract.stakedtokenId(stakeid);
-  //         const test = BigNumber.from(tokenId).toString();
-
-  //         newdic[test] = stakeid;
-  //         IdList.push(BigNumber.from(tokenId).toString());
-  //       });
-  //       setStakeIdTokenIdDic(newdic);
-  //       setstakedIdsList(IdList);
-  //     } catch (error) {
-  //       console.log("error", error);
-  //     }
-  //   }
-  // };
   //
   //
   //
@@ -251,7 +202,7 @@ const Kingdom = (props) => {
   function getRandomInt(max) {
     return Math.floor(Math.random() * max);
   }
-  const handleStake = async () => {
+  const handleStake = async (name) => {
     if (Number(availableStructCount) < 1) {
     } else {
       if (window.ethereum) {
@@ -263,22 +214,23 @@ const Kingdom = (props) => {
           signer
         );
         getRandomInt(availableStructCount);
+        console.log(name);
 
         try {
           //debugger;
           const response = await contract.stake(
             structContract,
             tokenId[walletCurImage],
-            legendContract
+            legendContract,
+            name
           );
-          response.wait().then((data) => {
-            // update the front end bal before the blockchain data returns
-            setStructureStakedCount((prevState) => prevState + 1);
-            setAvailableStructCount((prevState) => prevState - 1);
-            structBalanceHandler();
-            checkStakedStruct();
-            //generateTokenIdsFromStakeIds();
-          });
+          await response.wait();
+          // update the front end bal before the blockchain data returns
+          setStructureStakedCount((prevState) => prevState + 1);
+          setAvailableStructCount((prevState) => prevState - 1);
+          structBalanceHandler();
+          checkStakedStruct();
+          //generateTokenIdsFromStakeIds();
         } catch (error) {
           console.log("error", error);
         }
@@ -437,17 +389,21 @@ const Kingdom = (props) => {
             return ipfs.replace("ipfs://", `${startURL}`);
           })
         );
+        const TokenList = [];
 
         const imageURI = await Promise.all(
           FetchURI.map(async (link) => {
             const response = await fetch(link);
             const data = await response.json();
-            return data.image;
+            const dic = {};
+            dic["name"] = data.attributes[1].value;
+            dic["image"] = data.image;
+            TokenList.push(dic);
           })
         );
         let idImgsDic = {};
         for (let i = 0; i < walletStructImages.length; i++) {
-          idImgsDic[`${walletStructImages[i]}`] = imageURI[i];
+          idImgsDic[`${walletStructImages[i]}`] = TokenList[i];
         }
 
         // staking part
@@ -536,13 +492,6 @@ const Kingdom = (props) => {
 
         await loop();
 
-        //End Of Filter
-        // staked Ids
-
-        //debugger;
-
-        //console.log(await address);
-        // get ids and keypair of mapping
         let newdic = {};
         let IdList = [];
         lastStakeIds.forEach(async (stakeid) => {
@@ -559,19 +508,17 @@ const Kingdom = (props) => {
         console.log(IdList);
         settokenId(idSet);
         setWalletStructImages(idSet);
-        //getStakedImage();
-        //generateTokenIdsFromStakeIds();
       } catch (error) {
         console.log("error", error);
       }
     }
   };
 
-  const stakeClickHandler = () => {
+  const stakeClickHandler = (name) => {
     //make button roll
 
     //make change
-    setStakeClick((prevState) => prevState + 1);
+    setStakeClick(name);
   };
 
   const claimClickHandler = () => {
@@ -634,7 +581,8 @@ const Kingdom = (props) => {
   }, [claimClick]);
   //stake
   useEffect(() => {
-    stakeClick !== 0 && (approved === true ? handleStake() : handleApprove());
+    stakeClick !== 0 &&
+      (approved === true ? handleStake(stakeClick) : handleApprove());
   }, [stakeClick]);
 
   useEffect(() => {
@@ -773,22 +721,35 @@ const Kingdom = (props) => {
                   />
                   {walletStructImages.map((item) => {
                     return (
-                      <div
-                        className={
-                          walletStructImages.indexOf(item) === walletCurImage
-                            ? "  active"
-                            : "slide"
-                        }
-                      >
-                        {walletStructImages.indexOf(item) ===
-                          walletCurImage && (
-                          <img
-                            key={walletStructImages.indexOf(item)}
-                            src={walletMap[item]}
-                            alt={item}
-                          />
-                        )}
-                      </div>
+                      <>
+                        <div
+                          className={
+                            walletStructImages.indexOf(item) === walletCurImage
+                              ? "  active"
+                              : "slide"
+                          }
+                        >
+                          {Object.keys(walletMap).length !== 0 &&
+                            walletStructImages.indexOf(item) ===
+                              walletCurImage && (
+                              <img
+                                key={walletStructImages.indexOf(item)}
+                                src={walletMap[item].image}
+                                alt={item}
+                              />
+                            )}
+                          <button
+                            className="mb-4 rounded-md bg-[#FEDC8C] px-4 py-2"
+                            onClick={() => {
+                              stakeClickHandler(walletMap[item].name);
+                            }}
+                          >
+                            {approved === true
+                              ? "Stake Structure"
+                              : "Approve Structure"}
+                          </button>
+                        </div>
+                      </>
                     );
                   })}
 
@@ -799,12 +760,6 @@ const Kingdom = (props) => {
                   />
                 </section>
               )}
-              <button
-                className="mb-4 rounded-md bg-[#FEDC8C] px-4 py-2"
-                onClick={stakeClickHandler}
-              >
-                {approved === true ? "Stake Structure" : "Approve Structure"}
-              </button>
             </div>
             <div className="h-[0.1rem] w-11/12 bg-slate-900"></div>
             <h2 className="my-2 ml-4 self-start text-2xl font-bold md:text-base">

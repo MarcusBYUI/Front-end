@@ -346,57 +346,6 @@ const Upgrades = () => {
     }
   };
 
-  const checkUpgradeableStruct = async () => {
-    if (window.ethereum) {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const contract = new ethers.Contract(structContract, erc20Abi, signer);
-      const address = await signer.getAddress().then(function (response) {
-        return response;
-      });
-      try {
-        //debugger;
-
-        //console.log(await address);
-        const balance = await contract.balanceOf(address);
-        //const balance = ethers.utils.formatEther(balanceBig);
-
-        setAvailableStructCount(Math.round(await balance));
-      } catch (error) {
-        console.log("error", error);
-      }
-    }
-  };
-
-  const checkUpgradingStruct = async () => {
-    if (window.ethereum) {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const contract = new ethers.Contract(
-        bolstakingContract,
-        stakingAbi,
-        signer
-      );
-      const address = await signer.getAddress().then(function (response) {
-        return response;
-      });
-      try {
-        //debugger;
-        const stakeIds = await contract.staked(address);
-        let ids = [];
-
-        await stakeIds.forEach(function (element) {
-          ids.push(element.stakeId);
-        });
-        setStakeIds([...ids]);
-
-        //setStructureStakedCount(ids.length);
-      } catch (error) {
-        console.log("error", error);
-      }
-    }
-  };
-
   const handleUpgrade = async (name, tokenId) => {
     if (Number(availableStructCount) < 1) {
     } else {
