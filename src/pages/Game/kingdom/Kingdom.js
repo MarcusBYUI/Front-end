@@ -224,12 +224,13 @@ const Kingdom = (props) => {
             legendContract,
             name
           );
-          await response.wait();
-          // update the front end bal before the blockchain data returns
-          setStructureStakedCount((prevState) => prevState + 1);
-          setAvailableStructCount((prevState) => prevState - 1);
-          structBalanceHandler();
-          checkStakedStruct();
+          response.wait().then((data) => {
+            // update the front end bal before the blockchain data returns
+            setStructureStakedCount((prevState) => prevState + 1);
+            setAvailableStructCount((prevState) => prevState - 1);
+            structBalanceHandler();
+            checkStakedStruct();
+          });
           //generateTokenIdsFromStakeIds();
         } catch (error) {
           console.log("error", error);
@@ -562,7 +563,7 @@ const Kingdom = (props) => {
   useEffect(() => {
     setTimeout(() => {
       Object.keys(walletStructImages).length > 0 && getWalletImage();
-    }, 7000);
+    }, 2000);
   }, [walletStructImages]);
   useEffect(() => {
     console.log("time");
