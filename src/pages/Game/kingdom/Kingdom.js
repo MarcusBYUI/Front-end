@@ -47,9 +47,9 @@ const Kingdom = (props) => {
     { idUser: "0xE416", value: "-", tag: "$LEGEND" },
   ]);
 
-  const legendContract = "0xB6cEAdcd2A31F9d386111F3B3aeDcafCfCEF20e5";
-  const structContract = "0xBCA70C6126054ED27f996d0655E2cBa5669b07EB";
-  const bolstakingContract = "0xfd328c0d6d644074F4C8C184D7173A99a651dFae";
+  const legendContract = "0x3CBef762A500968986E3410a94CbF8daA5cceC84";
+  const structContract = "0x399C143e1100Bdd35035D9A52D4c681e6427640b";
+  const bolstakingContract = "0xC96aAe9d56618B515e8FA074404f0647b3e16Bf8";
   const IMGBASEURL =
     "https://bol.mypinata.cloud/ipfs/QmbT92ijUi3iJXJv9zz1yJxMaRDkC9LyExUAQd8b5n3eie/";
 
@@ -618,7 +618,7 @@ const Kingdom = (props) => {
         $LEGEND in your wallet: {legendCount}
       </h2>
 
-      {/* <Swap swapFunc={afterSwapHandler} /> */}
+      { <Swap swapFunc={afterSwapHandler} /> }
 
       <div className="border-div m-auto mt-10 grid min-h-[100vh] w-[90%] grid-cols-1 place-content-center place-items-center gap-4 pb-4 sm:mt-20 sm:w-4/5  md:w-[95%] md:grid-cols-2 md:grid-rows-3 lg:grid-cols-3 lg:grid-rows-2 lg:gap-x-10 xl:w-3/4">
         <div className='relative flex min-h-[36rem] w-full items-center justify-center bg-[url("/src/Assets/Borders-lg.png")] bg-[length:100%_100%]'>
