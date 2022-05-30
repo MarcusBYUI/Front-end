@@ -25,6 +25,8 @@ const Upgrades = () => {
   const [upgradingMap, setUpgradingMap] = useState({});
   const [timerState, setTimerState] = useState({});
   const [tokenTimer, setTokenTimer] = useState({});
+  const [legendCount, setLegendCount] = useState(0);
+
 
   const [walletStructImages, setWalletStructImages] = useState([]);
   const [upgradeableCurImage, setupgradeableCurImage] = useState(0);
@@ -339,7 +341,7 @@ const Upgrades = () => {
         const balanceBig = await contract.balanceOf(address);
         const balance = ethers.utils.formatEther(balanceBig);
 
-        // setLegendCount(Math.round(balance));
+        setLegendCount(Math.round(balance));
       } catch (error) {
         console.log("error", error);
       }
@@ -474,12 +476,14 @@ const Upgrades = () => {
   useEffect(() => {
     getWalletImage();
     getUpgradingImage();
+    legendBalanceHandler();
   }, [availableStructCount, structureUpgradingCount]);
 
   useEffect(() => {
     const reload = async () => {
       await handleIds();
       await checkApproved();
+      legendBalanceHandler();
     };
     reload();
   }, [approved]);
@@ -489,7 +493,7 @@ const Upgrades = () => {
     <div className="upgrades-body">
       <div className="upgrades-header">
         <h1>Upgrades</h1>
-        <h2>$LEGEND in your wallet: 10000</h2>
+        <h2>$LEGEND in your wallet: {legendCount}</h2>
       </div>
       <div className="upgrades-grid">
         <div className='relative flex min-h-[36rem] w-full items-center justify-center bg-[url("/src/Assets/Borders-lg.png")] bg-[length:100%_100%]'>
