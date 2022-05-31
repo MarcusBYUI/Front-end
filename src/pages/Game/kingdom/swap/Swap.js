@@ -1,7 +1,7 @@
 import { React, useState, useEffect } from "react";
 import { ethers, BigNumber } from "ethers";
 import oldbolAbi from "../../../../oldabi.json";
-import bolAbi from "../../../../abi.json";
+import bolAbi from "../../../../oldbol.json";
 
 import "./style.css";
 
@@ -36,27 +36,46 @@ const Swap = (props) => {
     if (window.ethereum) {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
-      const contract = new ethers.Contract(
-        oldStructContract,
-        oldbolAbi,
-        signer
-      );
+      const contract = new ethers.Contract(oldStructContract, bolAbi, signer);
       const address = await signer.getAddress().then((response) => {
         return response;
       });
       const idSet = [];
-      let getIds = true;
-      let i = 0;
-      while (getIds) {
-        try {
-          //debugger;
-          const tokenID = await contract.tokenOfOwnerByIndex(address, i);
-          idSet.push(BigNumber.from(tokenID._hex).toNumber());
-          i++;
-        } catch (error) {
-          getIds = false;
-          settokenId(idSet);
+      try {
+        //debugger;
+        const changedIds = await contract.ownershipChangeIds(address);
+        const mintIds = await contract.getIds(address);
+        changedIds.forEach(function (element) {
+          const num = BigNumber.from(element._hex).toNumber();
+          idSet.push(num);
+        });
+        mintIds.forEach(function (element) {
+          const num = BigNumber.from(element._hex).toNumber();
+          idSet.push(num);
+        });
+
+        //filter Ids
+        for (let i = 0; i <= idSet.length; i++) {
+          let count = 0;
+          let num = idSet[i];
+          idSet.forEach((element) => {
+            if (element === num) {
+              count++;
+
+              if (count === 2) {
+                idSet.splice(idSet.indexOf(element), 1);
+                idSet.splice(idSet.indexOf(element), 1);
+                count = 0;
+                i -= 2;
+              }
+            }
+          });
         }
+
+        settokenId(idSet);
+        //setstakedIdsList(IdList);
+      } catch (error) {
+        console.log("error", error);
       }
     }
   };
