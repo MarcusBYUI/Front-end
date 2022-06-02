@@ -11,7 +11,7 @@ import "./upgrades.css";
 
 const Upgrades = () => {
   const legendContract = "0x3CBef762A500968986E3410a94CbF8daA5cceC84";
-  const structContract = "0x399C143e1100Bdd35035D9A52D4c681e6427640b";
+  const structContract = "0x494bdd9116c7fAb77000484617D1a95B17bE740f";
   const bolstakingContract = "0xC96aAe9d56618B515e8FA074404f0647b3e16Bf8";
   const IMGBASEURL =
     "https://bol.mypinata.cloud/ipfs/QmbT92ijUi3iJXJv9zz1yJxMaRDkC9LyExUAQd8b5n3eie/";
@@ -26,7 +26,6 @@ const Upgrades = () => {
   const [timerState, setTimerState] = useState({});
   const [tokenTimer, setTokenTimer] = useState({});
   const [legendCount, setLegendCount] = useState(0);
-
 
   const [walletStructImages, setWalletStructImages] = useState([]);
   const [upgradeableCurImage, setupgradeableCurImage] = useState(0);
@@ -175,22 +174,29 @@ const Upgrades = () => {
 
   const startURL = "https://bol.mypinata.cloud/ipfs/";
   const decideLevel = (string) => {
-    if (string.includes("QmXTg1LCuKJ83njDyVJeLvtFjpWDTog5n9UKLv1Gt9xPVZ") || string.includes("QmXm1T3kPMjBG7PERgPsa3gY4efbkbk6ry8UhMQ1Nb6WBY")) {
+    if (
+      string.includes("QmXTg1LCuKJ83njDyVJeLvtFjpWDTog5n9UKLv1Gt9xPVZ") ||
+      string.includes("QmXm1T3kPMjBG7PERgPsa3gY4efbkbk6ry8UhMQ1Nb6WBY")
+    ) {
       return 1;
     } else if (
-      string.includes("QmWjJhcQmDFSewnKz8AAdy98D8DKo7dMRPWTw991HnXB41") || string.includes("QmTZSmXaruR7pWgUnLzjJp819gPyDWsofhRpWubcipNWZf")
+      string.includes("QmWjJhcQmDFSewnKz8AAdy98D8DKo7dMRPWTw991HnXB41") ||
+      string.includes("QmTZSmXaruR7pWgUnLzjJp819gPyDWsofhRpWubcipNWZf")
     ) {
       return 2;
     } else if (
-      string.includes("QmSFQLRVEFEK1kcQ5NVz4h1iyrBDR9zwvJJuDEKDrAb2VP") || string.includes("QmSiiyTc13oRnq4DivgcEgj1P43bx4AEwsoT4ffn39LM2x")
+      string.includes("QmSFQLRVEFEK1kcQ5NVz4h1iyrBDR9zwvJJuDEKDrAb2VP") ||
+      string.includes("QmSiiyTc13oRnq4DivgcEgj1P43bx4AEwsoT4ffn39LM2x")
     ) {
       return 3;
     } else if (
-      string.includes("QmQk7z9eoe5RaJtEW2cqbEnCwnwUcESsgV8nYKvKJkqJqz") || string.includes("QmfP8yUwkXVKeUHY5Nzjcbetj8QArunw2uBFi6ZVXNp9Au")
+      string.includes("QmQk7z9eoe5RaJtEW2cqbEnCwnwUcESsgV8nYKvKJkqJqz") ||
+      string.includes("QmfP8yUwkXVKeUHY5Nzjcbetj8QArunw2uBFi6ZVXNp9Au")
     ) {
       return 4;
     } else if (
-      string.includes("QmTKfoKReK4VkZnirNAWHziiTjXtqgREskHmzH2EJfBkVT") || string.includes("Qmd7pbdJGyECsQabwcgJFuYdLJegqQL29fRVuULeqgLNxk")
+      string.includes("QmTKfoKReK4VkZnirNAWHziiTjXtqgREskHmzH2EJfBkVT") ||
+      string.includes("Qmd7pbdJGyECsQabwcgJFuYdLJegqQL29fRVuULeqgLNxk")
     ) {
       return 5;
     } else {
@@ -405,36 +411,36 @@ const Upgrades = () => {
         "QmNT6jNfrFK1QjDCQgu2WXY6uvCTWTvhhFFg8beZxCJh5s",
         "QmWomiuzkKf3w9ZAGqByKewDaPmQKMd81Td1ySs3WPG3d5"
       );
-    }// testing tesu=ting
-     else if (
+    } // testing tesu=ting
+    else if (
       string.includes("QmRFCGar2zMMW75RpvkNXJDtYVe4s8CHUk691DFVnd8kTr")
     ) {
       return string.replace(
         "QmRFCGar2zMMW75RpvkNXJDtYVe4s8CHUk691DFVnd8kTr",
         "QmXm1T3kPMjBG7PERgPsa3gY4efbkbk6ry8UhMQ1Nb6WBY"
       );
-    }else if (
+    } else if (
       string.includes("QmXm1T3kPMjBG7PERgPsa3gY4efbkbk6ry8UhMQ1Nb6WBY")
     ) {
       return string.replace(
         "QmXm1T3kPMjBG7PERgPsa3gY4efbkbk6ry8UhMQ1Nb6WBY",
         "QmTZSmXaruR7pWgUnLzjJp819gPyDWsofhRpWubcipNWZf"
       );
-    }else if (
+    } else if (
       string.includes("QmTZSmXaruR7pWgUnLzjJp819gPyDWsofhRpWubcipNWZf")
     ) {
       return string.replace(
         "QmTZSmXaruR7pWgUnLzjJp819gPyDWsofhRpWubcipNWZf",
         "QmSiiyTc13oRnq4DivgcEgj1P43bx4AEwsoT4ffn39LM2x"
       );
-    }else if (
+    } else if (
       string.includes("QmSiiyTc13oRnq4DivgcEgj1P43bx4AEwsoT4ffn39LM2x")
     ) {
       return string.replace(
         "QmSiiyTc13oRnq4DivgcEgj1P43bx4AEwsoT4ffn39LM2x",
         "QmfP8yUwkXVKeUHY5Nzjcbetj8QArunw2uBFi6ZVXNp9Au"
       );
-    }else if (
+    } else if (
       string.includes("QmfP8yUwkXVKeUHY5Nzjcbetj8QArunw2uBFi6ZVXNp9Au")
     ) {
       return string.replace(

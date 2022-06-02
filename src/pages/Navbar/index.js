@@ -163,12 +163,6 @@ const Navbar = () => {
                   </RouteLink>
                   <div className="hidden justify-around pt-1 sm:flex sm:w-[20rem] lg:w-[30rem]">
                     <RouteLink
-                      to="/team"
-                      className="mr-4 font-semibold text-[#FEDB8C] md:mr-2 lg:mr-0"
-                    >
-                      Team
-                    </RouteLink>
-                    <RouteLink
                       to="/minting"
                       className="mx-2 font-semibold text-[#FEDB8C]"
                     >
