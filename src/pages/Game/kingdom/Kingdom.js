@@ -48,7 +48,7 @@ const Kingdom = (props) => {
   ]);
 
   const legendContract = "0x3CBef762A500968986E3410a94CbF8daA5cceC84";
-  const structContract = "0x399C143e1100Bdd35035D9A52D4c681e6427640b";
+  const structContract = "0x494bdd9116c7fAb77000484617D1a95B17bE740f";
   const bolstakingContract = "0xC96aAe9d56618B515e8FA074404f0647b3e16Bf8";
   const IMGBASEURL =
     "https://bol.mypinata.cloud/ipfs/QmbT92ijUi3iJXJv9zz1yJxMaRDkC9LyExUAQd8b5n3eie/";
@@ -618,7 +618,7 @@ const Kingdom = (props) => {
         $LEGEND in your wallet: {legendCount}
       </h2>
 
-      { <Swap swapFunc={afterSwapHandler} /> }
+      {<Swap swapFunc={afterSwapHandler} />}
 
       <div className="border-div m-auto mt-10 grid min-h-[100vh] w-[90%] grid-cols-1 place-content-center place-items-center gap-4 pb-4 sm:mt-20 sm:w-4/5  md:w-[95%] md:grid-cols-2 md:grid-rows-3 lg:grid-cols-3 lg:grid-rows-2 lg:gap-x-10 xl:w-3/4">
         <div className='relative flex min-h-[36rem] w-full items-center justify-center bg-[url("/src/Assets/Borders-lg.png")] bg-[length:100%_100%]'>
